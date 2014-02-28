@@ -1,6 +1,19 @@
 # Required packages (tested on Ubuntu 12.04):
 # inkscape texlive-latex-base texlive-font-utils dia python-pygments
 
+VENDOR?=common
+
+# Init some help variables, each slideshow/lab will add to these
+HELPER=help-header
+AGENDAS=agenda-help
+SLIDE_HELPER=slides-help
+LAB_HELPER=lab-help
+TRAINING_HELPER=training-help
+TRAININGS=
+
+HELP_FORMAT=" %-32s%s\n"
+HELP=@printf $(HELP_FORMAT)
+
 # Needed tools
 INKSCAPE = inkscape
 PDFLATEX = pdflatex
@@ -12,283 +25,7 @@ UPPERCASE = $(shell echo $1 | tr "[:lower:]" "[:upper:]")
 
 # List of slides for the different courses
 
-KERNEL_SLIDES = \
-		licensing \
-		about-us \
-		course-information-title \
-		beagleboneblack-board \
-		kernel-shopping-list \
-		course-information \
-		setup-lab \
-		kernel-introduction-title \
-		sysdev-linux-intro-features \
-		kernel-embedded-linux-usage-title \
-		kernel-linux-intro-sources \
-		kernel-source-code-download-lab \
-		kernel-source-code-title \
-		kernel-source-code-drivers \
-		kernel-source-code-layout \
-		kernel-source-code-management \
-		kernel-source-code-exploring-lab \
-		sysdev-linux-intro-configuration \
-		sysdev-linux-intro-compilation \
-		sysdev-linux-intro-cross-compilation \
-		kernel-board-setup-kernel-compiling-and-booting-labs \
-		sysdev-linux-intro-modules \
-		kernel-driver-development-modules \
-		kernel-driver-development-lab-modules \
-		kernel-driver-development-general-apis \
-		kernel-device-model \
-		kernel-i2c \
-		kernel-pinmuxing \
-		kernel-frameworks \
-		kernel-input \
-		kernel-driver-development-memory \
-		kernel-driver-development-io-memory \
-		kernel-driver-development-lab-io-memory \
-		kernel-misc-subsystem \
-		kernel-driver-development-processes \
-		kernel-driver-development-sleeping \
-		kernel-driver-development-interrupts \
-		kernel-driver-development-lab-interrupts \
-		kernel-driver-development-concurrency \
-		kernel-driver-development-lab-locking \
-		kernel-driver-development-debugging \
-		kernel-driver-development-lab-debugging \
-		kernel-porting-title \
-		kernel-porting-content \
-		kernel-power-management-title \
-		kernel-power-management-content \
-		kernel-development-process-title \
-		sysdev-linux-intro-versioning \
-		kernel-contribution \
-		kernel-resources-title \
-		kernel-resources-references \
-		last-slides \
-		kernel-backup-slides-title \
-		kernel-driver-development-dma \
-		kernel-driver-development-mmap \
-		kernel-git-title \
-		kernel-git-content \
-		kernel-git-lab 
 
-SYSDEV_SLIDES = \
-		licensing \
-		about-us \
-		course-information-title \
-		igepv2-board \
-		course-information \
-		sysdev-intro \
-		sysdev-dev-environment \
-		setup-lab \
-		sysdev-toolchains-title \
-		sysdev-toolchains-definition \
-		sysdev-toolchains-c-libraries-title \
-		c-libraries \
-		sysdev-toolchains-options \
-		sysdev-toolchains-obtaining \
-		sysdev-toolchains-lab \
-		sysdev-bootloaders-title \
-		sysdev-bootloaders-sequence \
-		sysdev-bootloaders-u-boot \
-		sysdev-bootloaders-lab \
-		sysdev-linux-intro-title \
-		sysdev-linux-intro-features \
-		sysdev-linux-intro-versioning \
-		sysdev-linux-intro-sources \
-		sysdev-linux-intro-lab-sources \
-		sysdev-linux-intro-configuration \
-		sysdev-linux-intro-compilation \
-		sysdev-linux-intro-cross-compilation \
-		sysdev-linux-intro-lab-cross-compilation \
-		sysdev-linux-intro-modules \
-		sysdev-root-filesystem-title \
-		sysdev-root-filesystem-principles \
-		initramfs \
-		sysdev-root-filesystem-contents \
-		sysdev-root-filesystem-device-files \
-		sysdev-root-filesystem-virtual-fs \
-		sysdev-root-filesystem-minimal \
-		boot-sequence-initramfs \
-		sysdev-busybox \
-		sysdev-block-filesystems \
-		sysdev-flash-filesystems \
-		sysdev-embedded-linux \
-		sysdev-application-development \
-		sysdev-realtime \
-		sysdev-references \
-		last-slides
-
-ANDROID_SLIDES = \
-		licensing \
-		about-us \
-		course-information-title \
-		beagleboneblack-board \
-		android-course-outline \
-		course-information \
-		setup-lab \
-		android-introduction-title \
-		android-introduction-features \
-		android-introduction-history \
-		android-introduction-architecture \
-		android-introduction-lab \
-		android-source-title \
-		android-source-obtaining \
-		android-source-organization \
-		android-source-compilation \
-		android-source-contribute \
-		android-source-lab \
-		sysdev-linux-intro-title \
-		sysdev-linux-intro-features \
-		sysdev-linux-intro-versioning \
-		sysdev-linux-intro-configuration \
-		sysdev-linux-intro-compilation \
-		sysdev-linux-intro-cross-compilation \
-		android-kernel-lab-compilation \
-		android-kernel-changes-title \
-		android-kernel-changes-wakelocks \
-		android-kernel-changes-binder \
-		android-kernel-changes-klogger \
-		android-kernel-changes-ashmem \
-		android-kernel-changes-timers \
-		android-kernel-changes-lmk \
-		android-kernel-changes-ion \
-		android-kernel-changes-network \
-		android-kernel-changes-misc \
-		android-kernel-changes-mainline \
-		android-bootloaders-title \
-		sysdev-bootloaders-sequence \
-		android-bootloaders-fastboot \
-		android-new-board-lab \
-		android-adb-title \
-		android-adb-introduction \
-		android-adb-use \
-		android-adb-examples \
-		android-adb-lab \
-		android-fs-title \
-		sysdev-root-filesystem-principles \
-		initramfs \
-		android-fs-contents \
-		sysdev-root-filesystem-device-files \
-		sysdev-root-filesystem-minimal \
-		android-build-system-title \
-		android-build-system-basics \
-		android-build-system-envsetup \
-		android-build-system-configuration \
-		android-build-system-modules \
-		android-build-system-lab-library \
-		android-build-system-product \
-		android-build-system-lab-product \
-		android-native-layer-title \
-		sysdev-toolchains-definition \
-		android-native-layer-bionic \
-		android-native-layer-toolbox \
-		android-native-layer-init \
-		android-native-layer-daemons \
-		android-native-layer-flingers \
-		android-native-layer-stagefright \
-		android-native-layer-dalvik \
-		android-native-layer-hal \
-		android-native-layer-jni \
-		android-native-layer-lab-binary \
-		android-framework-title \
-		android-framework-native-services \
-		android-framework-ipc \
-		android-framework-java-services \
-		android-framework-extend \
-		android-framework-lab \
-		android-application-title \
-		android-application-basics \
-		android-application-activities \
-		android-application-services \
-		android-application-providers \
-		android-application-intents \
-		android-application-processes \
-		android-application-resources \
-		android-application-storage \
-		android-application-apk \
-		android-application-lab \
-		android-resources \
-		last-slides
-
-BOOTTIME_SLIDES = \
-		licensing \
-		thanks-atmel \
-		about-us \
-		course-information-title \
-		sama5d3-board \
-		boottime-course-outline \
-		boottime-principles \
-		boottime-measuring \
-		boottime-filesystems \
-		boottime-init-scripts \
-		boottime-c-libraries-title \
-		c-libraries \
-		boottime-init-scripts2 \
-		initramfs \
-		boot-sequence-initramfs \
-		boottime-init-scripts3 \
-		boottime-application \
-		boottime-kernel \
-		boottime-bootloader \
-		boottime-hardware-init \
-		boottime-alternatives \
-
-# List of labs for the different courses
-
-SYSDEV_LABS   = setup \
-		sysdev-toolchain \
-		sysdev-u-boot \
-		sysdev-kernel-fetch-and-patch \
-		sysdev-kernel-cross-compiling \
-		sysdev-tinysystem \
-		sysdev-block-filesystems \
-		sysdev-flash-filesystems \
-		sysdev-thirdparty \
-		sysdev-buildroot \
-		sysdev-application-development \
-		sysdev-application-debugging \
-		sysdev-real-time \
-		backup
-
-KERNEL_LABS   = setup \
-		kernel-sources-download \
-		kernel-sources-exploring \
-		kernel-board-setup \
-		kernel-compiling-and-nfs-booting \
-		kernel-module-simple \
-		kernel-i2c-device-model \
-		kernel-i2c-communication \
-		kernel-i2c-input-interface \
-		kernel-serial-iomem \
-		kernel-serial-output \
-		kernel-serial-interrupt \
-		kernel-locking \
-		kernel-debugging \
-		kernel-git \
-#		backup # Currently broken for kernel course
-
-ANDROID_LABS  = setup \
-		android-source-code \
-		android-first-compilation \
-		android-boot \
-		android-new-board \
-		android-adb \
-		android-native-library \
-		android-system-customization \
-		android-native-app \
-		android-jni-library \
-		android-application \
-
-BOOTTIME_LABS = boottime-install \
-		boottime-getting-started \
-		boottime-measuring \
-		boottime-setup \
-		boottime-init-scripts \
-		boottime-application \
-		boottime-kernel \
-		boottime-bootloader \
-		boottime-results \
 
 # Output directory
 OUTDIR   = $(PWD)/out
@@ -297,14 +34,14 @@ OUTDIR   = $(PWD)/out
 VARS = $(OUTDIR)/vars
 
 # Environment for pdflatex, which allows it to find the stylesheet in the
-# common/ directory.
-PDFLATEX_ENV = TEXINPUTS=.:$(PWD)/common:
+# $(VENDOR)/ directory.
+PDFLATEX_ENV = TEXINPUTS=.:$(PWD)/$(VENDOR):
 
 # Arguments passed to pdflatex
 PDFLATEX_OPT = -shell-escape -file-line-error -halt-on-error
 
-# The common slide stylesheet
-STYLESHEET = common/beamerthemeFreeElectrons.sty
+# The $(VENDOR) slide stylesheet
+include	${VENDOR}/vendor.mk
 
 #
 # === Picture lookup ===
@@ -332,14 +69,16 @@ PICTURES = \
 	$(call PICTURES_NO_TRANSFORMATION,$(1),png)   \
 	$(call PICTURES_NO_TRANSFORMATION,$(1),jpg)
 
-# List of common pictures
-COMMON_PICTURES   = $(call PICTURES,common)
+# List of $(VENDOR) pictures
+COMMON_PICTURES   = $(call PICTURES,$(VENDOR))
 
 default: help
 
 #
 # === Compilation of slides ===
 #
+# List of slides for the different courses
+include	config/slides.mk
 
 # This rule allows to build slides of the training. It is done in two
 # parts with make calling itself because it is not possible to compute
@@ -350,14 +89,19 @@ default: help
 # The value of slide can be "full-kernel", "full-sysdev" (for the
 # complete trainings) or the name of an individual chapter.
 ifdef SLIDES
+$(warning "SLIDES=$(SLIDES)")
 # Compute the set of chapters to build depending on the name of the
 # PDF file that was requested.
 ifeq ($(firstword $(subst -, , $(SLIDES))),full)
 SLIDES_TRAINING      = $(lastword $(subst -, , $(SLIDES)))
-SLIDES_COMMON_BEFORE = common/slide-header.tex \
-		       common/$(SLIDES_TRAINING)-title.tex
+$(warning "SLIDES_TRAINING=$(SLIDES_TRAINING)")
+SLIDES_COMMON_BEFORE = $(VENDOR)/slide-header.tex \
+		       $(VENDOR)/slides/$(SLIDES_TRAINING)-title.tex
 SLIDES_CHAPTERS      = $($(call UPPERCASE, $(SLIDES_TRAINING))_SLIDES)
-SLIDES_COMMON_AFTER  = common/slide-footer.tex
+SLIDES_COMMON_AFTER  = $(VENDOR)/slide-footer.tex
+$(warning "SLIDES_COMMON_BEFORE=$(SLIDES_COMMON_BEFORE)")
+$(warning "SLIDES_CHAPTERS=$(SLIDES_CHAPTERS)")
+$(warning "SLIDES_COMMON_AFTER=$(SLIDES_COMMON_AFTER)")
 else
 SLIDES_TRAINING      = $(firstword $(subst -, ,  $(SLIDES)))
 # We might be building multiple chapters that share a common
@@ -367,11 +111,11 @@ SLIDES_TRAINING      = $(firstword $(subst -, ,  $(SLIDES)))
 # chapter name.
 SLIDES_CHAPTERS      = $(filter $(SLIDES)%, $($(call UPPERCASE, $(SLIDES_TRAINING))_SLIDES))
 ifeq ($(words $(SLIDES_CHAPTERS)),1)
-SLIDES_COMMON_BEFORE = common/slide-header.tex common/single-subsection-slide-title.tex
+SLIDES_COMMON_BEFORE = $(VENDOR)/slide-header.tex $(VENDOR)/single-subsection-slide-title.tex
 else
-SLIDES_COMMON_BEFORE = common/slide-header.tex common/single-slide-title.tex
+SLIDES_COMMON_BEFORE = $(VENDOR)/slide-header.tex $(VENDOR)/single-slide-title.tex
 endif
-SLIDES_COMMON_AFTER  = common/slide-footer.tex
+SLIDES_COMMON_AFTER  = $(VENDOR)/slide-footer.tex
 endif
 
 ifeq ($(SLIDES_CHAPTERS),)
@@ -410,35 +154,39 @@ SLIDES_PICTURES = $(call PICTURES,$(foreach s,$(SLIDES_CHAPTERS),slides/$(s))) $
 else
 FORCE:
 %-slides.pdf: FORCE
+	@echo	"make SLIDES=$@"
 	@$(MAKE) $@ SLIDES=$*
 endif
 
+include	config/labs.mk
+
+ifeq (a,b)
 #
 # === Compilation of labs ===
 #
 
 ifdef LABS
-LABS_HEADER        = common/labs-header.tex
-LABS_FOOTER        = common/labs-footer.tex
+LABS_HEADER        = $(VENDOR)/labs-header.tex
+LABS_FOOTER        = $(VENDOR)/labs-footer.tex
 # Compute the set of chapters to build depending on the name of the
 # PDF file that was requested.
 ifeq ($(LABS),full-kernel)
-LABS_VARSFILE      = common/kernel-labs-vars.tex
+LABS_VARSFILE      = $(VENDOR)/kernel-labs-vars.tex
 LABS_CHAPTERS      = $(KERNEL_LABS)
 else ifeq ($(LABS),full-sysdev)
-LABS_VARSFILE      = common/sysdev-labs-vars.tex
+LABS_VARSFILE      = $(VENDOR)/sysdev-labs-vars.tex
 LABS_CHAPTERS      = $(SYSDEV_LABS)
 else ifeq ($(LABS),full-android)
-LABS_VARSFILE      = common/android-labs-vars.tex
+LABS_VARSFILE      = $(VENDOR)/android-labs-vars.tex
 LABS_CHAPTERS      = $(ANDROID_LABS)
 else ifeq ($(LABS),full-boottime)
-LABS_VARSFILE      = common/boottime-labs-vars.tex
+LABS_VARSFILE      = $(VENDOR)/boottime-labs-vars.tex
 LABS_CHAPTERS      = $(BOOTTIME_LABS)
 else
-LABS_VARSFILE      = common/single-lab-vars.tex
+LABS_VARSFILE      = $(VENDOR)/single-lab-vars.tex
 LABS_CHAPTERS      = $(LABS)
-LABS_HEADER        = common/single-lab-header.tex
-LABS_FOOTER        = common/labs-footer.tex
+LABS_HEADER        = $(VENDOR)/single-lab-header.tex
+LABS_FOOTER        = $(VENDOR)/labs-footer.tex
 endif
 
 # Compute the set of corresponding .tex files and pictures
@@ -449,7 +197,7 @@ LABS_TEX      = \
 	$(LABS_FOOTER)
 LABS_PICTURES = $(call PICTURES,$(foreach s,$(LABS_CHAPTERS),labs/$(s))) $(COMMON_PICTURES)
 
-%-labs.pdf: common/labs.sty $(VARS) $(LABS_TEX) $(LABS_PICTURES)
+%-labs.pdf: $(VENDOR)/labs.sty $(VARS) $(LABS_TEX) $(LABS_PICTURES)
 	@mkdir -p $(OUTDIR)
 # We generate a .tex file with \input{} directives (instead of just
 # concatenating all files) so that when there is an error, we are
@@ -476,6 +224,9 @@ FORCE:
 	@$(MAKE) $@ LABS=$*
 endif
 
+endif	#customization
+# ------------------------------------------------------------------------------------
+
 #
 # === Compilation of agendas ===
 #
@@ -483,7 +234,7 @@ ifdef AGENDA
 AGENDA_TEX = agenda/$(AGENDA)-agenda.tex
 AGENDA_PICTURES = $(COMMON_PICTURES) $(call PICTURES,agenda)
 
-%-agenda.pdf: common/agenda.sty $(AGENDA_TEX) $(AGENDA_PICTURES)
+%-agenda.pdf: $(VENDOR)/agenda.sty $(AGENDA_TEX) $(AGENDA_PICTURES)
 	rm -f $(OUTDIR)/$(basename $@).tex
 	cp $(filter %.tex,$^) $(OUTDIR)/$(basename $@).tex
 	(cd $(OUTDIR); $(PDFLATEX_ENV) $(PDFLATEX) $(basename $@).tex)
@@ -542,23 +293,75 @@ $(VARS): FORCE
 	/bin/echo "\def \sessionurl {$(SESSION_URL)}" > $@
 	/bin/echo "\def \training {$(SLIDES_TRAINING)}" >> $@
 
+
+# All training material
+trainings:	$(TRAININGS)
+
 clean:
 	$(RM) -rf $(OUTDIR) *.pdf
 
-help:
+
+
+help-header:
+	printf "\033c"
+	@echo 
+	@echo "============================================================================"
 	@echo "Available targets:"
 	@echo
-	@echo " full-sysdev-labs.pdf            Complete labs for the 'sysdev' course"
-	@echo " full-kernel-labs.pdf            Complete labs for the 'kernel' course"
-	@echo " full-android-labs.pdf           Complete labs for the 'android' course"
-	@echo " full-boottime-labs.pdf          Complete labs for the 'boottime' course"
-	@echo " full-sysdev-slides.pdf          Complete slides for the 'sysdev' course"
-	@echo " full-kernel-slides.pdf          Complete slides for the 'kernel' course"
-	@echo " full-android-slides.pdf         Complete slides for the 'android' course"
-	@echo " full-boottime-slides.pdf        Complete slides for the 'boottime' course"
-	@echo " kernel-agenda.pdf               Agenda for the 'kernel' course"
-	@echo " boottime-agenda.pdf             Agenda for the 'boottime' course"
+	$(HELP)	"trainings"	"All training material"
+
+
+#	@echo " full-sysdev-labs.pdf            Complete labs for the 'sysdev' course"
+#	@echo " full-kernel-labs.pdf            Complete labs for the 'kernel' course"
+#	@echo " full-android-labs.pdf           Complete labs for the 'android' course"
+#	@echo " full-boottime-labs.pdf          Complete labs for the 'boottime' course"
+#	@echo " full-sysdev-slides.pdf          Complete slides for the 'sysdev' course"
+#	@echo " full-kernel-slides.pdf          Complete slides for the 'kernel' course"
+#	@echo " full-android-slides.pdf         Complete slides for the 'android' course"
+#	@echo " full-boottime-slides.pdf        Complete slides for the 'boottime' course"
+#	@echo " kernel-agenda.pdf               Agenda for the 'kernel' course"
+#	@echo " boottime-agenda.pdf             Agenda for the 'boottime' course"
+
+training-help:
 	@echo
-	@echo " <some-chapter>-slides.pdf       Slides for a particular chapter in slides/"
-	@echo " <some-chapter>-labs.pdf         Labs for a particular chapter in labs/"
+	@echo "----------------------------------------------------------------------------"
+	@echo "TRAININGS:"
 	@echo
+
+agenda-help:
+	@echo
+	@echo "----------------------------------------------------------------------------"
+	@echo "AGENDAS:"
+	@echo
+
+lab-help:
+	@echo
+	@echo "----------------------------------------------------------------------------"
+	@echo "LABS:"
+	@echo
+
+slides-help:
+	@echo
+	@echo "----------------------------------------------------------------------------"
+	@echo "SLIDES:"
+	@echo
+
+slides-trailer:
+	@echo
+	$(HELP) "<some-chapter>-slides.pdf"		"Slides for a particular chapter in slides/"
+	@echo
+
+lab-trailer:
+	@echo
+	$(HELP) "<some-chapter>-labs.pdf"		"Labs for a particular chapter in labs/"
+	@echo
+
+help-trailer:
+	@echo "============================================================================"
+	@echo
+
+
+help:	$(HELPER) $(TRAINING_HELPER) $(AGENDAS) $(SLIDE_HELPER) slides-trailer $(LAB_HELPER) lab-trailer help-trailer
+
+debug:
+	@echo $(HELPER) $(TRAINING_HELPER) $(AGENDAS) $(SLIDE_HELPER) slides-trailer $(LAB_HELPER) lab-trailer help-trailer
