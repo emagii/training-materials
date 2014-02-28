@@ -7,7 +7,7 @@
 \usepackage{calc}
 
 \hypersetup{pdftitle={Embedded Linux kernel and driver development training},
-  pdfauthor={Free Electrons}}
+  pdfauthor={\vendor}}
 
 \begin{document}
 
@@ -24,8 +24,8 @@ Embedded Linux kernel and driver development training\\
 \vspace{1cm}
 
 \small
-\newcolumntype{g}{>{\columncolor{fedarkblue}}m{4cm}}
-\newcolumntype{h}{>{\columncolor{felightblue}}X}
+\newcolumntype{g}{>{\columncolor{darkagendacolor}}m{4cm}}
+\newcolumntype{h}{>{\columncolor{lightagendacolor}}X}
 
 \arrayrulecolor{lightgray} {
   \setlist[1]{itemsep=-5pt}
@@ -46,11 +46,11 @@ Embedded Linux kernel and driver development training\\
     \newline 50\% of lectures, 50\% of practical labs. \\
     \hline
 
-    {\bf Trainer} & One of the engineers listed on
-    \newline \url{http://free-electrons.com/training/trainers/}\\
+    {\bf Trainer} & \kerneltrainers
+    \newline \trainingurl\\
     \hline
 
-    {\bf Language} & Oral lectures: English, French or German.
+    {\bf Language} & Oral lectures: English, \locallanguage.
     \newline Materials: English.\\
     \hline
 
@@ -83,27 +83,31 @@ Embedded Linux kernel and driver development training\\
   \begin{tabularx}{\textwidth}{|g|h|}
     {\bf Required equipment} &
     {\bf For on-site sessions only}
-    \newline Everything is supplied by Free Electrons in public sessions.
+    \newline Everything is supplied by \vendor in public sessions.
     \begin{itemize}
     \item Video projector
     \item PC computers with at least 2 GB of RAM, and Ubuntu Linux
     installed in a {\bf free partition of at least 20 GB. Using Linux
       in a virtual machine is not supported}, because of issues
     connecting to real hardware.
-    \item We need Ubuntu Desktop 12.04 (32 or 64 bit, Xubuntu and
-    Kubuntu variants are fine). We don't support other
+    \item We need \hostmachine. We don't support other
     distributions, because we can't test all possible package versions.
     \item {\bf Connection to the Internet} (direct or through the
     company proxy).
     \item {\bf PC computers with valuable data must be backed up}
     before being used in our sessions.  Some people have already made
     mistakes during our sessions and damaged work data.
+    \item It is a good idea to do a fresh install on a new disk
+      which subsuquently can be used as an external USB disk.
     \end{itemize} \\
     \hline
 
     {\bf Materials} & Print and electronic copies of presentations and
     labs.
     \newline Electronic copy of lab files.\\
+    \hline
+
+    {\bf Credits} & This material is developed by Free-Electrons \localauthor .\\
     \hline
 
 \end{tabularx}}
@@ -155,7 +159,7 @@ Embedded Linux kernel and driver development training\\
   I2C, input or memory-mapped devices.
 }
 
-
+\clearpage
 \section{Day 1 - Morning}
 
 \feagendaonecolumn
@@ -213,6 +217,7 @@ Embedded Linux kernel and driver development training\\
   \end{itemize}
 }
 \\
+\clearpage
 \section{Day 2 - Morning}
 
 \feagendatwocolumn
@@ -262,6 +267,7 @@ Embedded Linux kernel and driver development training\\
   \end{itemize}
 }
 
+\clearpage
 \section{Day 3 - Morning}
 
 \feagendatwocolumn
@@ -328,6 +334,7 @@ Embedded Linux kernel and driver development training\\
   \end{itemize}
 }
 
+\clearpage
 \section{Day 4 - Morning}
 
 \feagendatwocolumn
@@ -409,6 +416,7 @@ Embedded Linux kernel and driver development training\\
   \end{itemize}
 }
 
+\clearpage
 \section{Day 5 - Morning}
 
 \feagendatwocolumn

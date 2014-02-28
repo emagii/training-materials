@@ -7,7 +7,7 @@
 \usepackage{calc}
 
 \hypersetup{pdftitle={Android System Development Training},
-  pdfauthor={Free Electrons}}
+  pdfauthor={\vendor}}
 
 \begin{document}
 
@@ -24,8 +24,8 @@ Android System Development Training\\
 \vspace{1cm}
 
 \small
-\newcolumntype{g}{>{\columncolor{fedarkblue}}m{4cm}}
-\newcolumntype{h}{>{\columncolor{felightblue}}X}
+\newcolumntype{g}{>{\columncolor{darkagendacolor}}m{4cm}}
+\newcolumntype{h}{>{\columncolor{lightagendacolor}}X}
 
 \arrayrulecolor{lightgray} {
   \setlist[1]{itemsep=-5pt}
@@ -45,11 +45,11 @@ Android System Development Training\\
     \newline 50\% of lectures, 50\% of practical labs. \\
     \hline
 
-    {\bf Trainer} & One of the engineers listed on
-    \newline \url{http://free-electrons.com/training/trainers/}\\
+    {\bf Trainer} & \kerneltrainers
+    \newline \trainingurl\\
     \hline
 
-    {\bf Language} & Oral lectures: English or French.
+    {\bf Language} & Oral lectures: English or \locallanguage .
     \newline Materials: English.\\
     \hline
 
@@ -60,7 +60,7 @@ Android System Development Training\\
     {\bf Prerequisites} & {\bf Knowledge and practice of Unix or
       GNU/Linux commands}
     \newline People lacking experience on this topic should get
-    trained by themselves with our freely available on-line slides
+    trained by themselves with the freely available on-line slides
     (\url{http://free-electrons.com/docs/command-line/})
     \newline {\bf Knowledge and practice of C programming}
     \newline {\bf Basics of Java programming} \\
@@ -70,12 +70,11 @@ Android System Development Training\\
     \begin{itemize}
     \item Video projector
     \item PC computers with at least 4 GB of RAM, a CPU at least
-      equivalent to an Intel Core i5 and Ubuntu Linux installed in a
-      {\bf free partition of at least 50 GB. Using Linux in a virtual
+      equivalent to an \hostmachine and Ubuntu Linux installed in a
+      {\bf free partition of at least \hostfreespace. Using Linux in a virtual
         machine is not supported}, because of issues connecting to
       real hardware.
-    \item We need Ubuntu Desktop 12.04 (64 bit, Xubuntu and Kubuntu
-      variants are fine). We don't support other distributions,
+    \item We need \hostos. We don't support other distributions,
       because we can't test all possible package versions.
     \item {\bf High Speed Connection to the Internet} (direct or
       through the company proxy), fast enough to download the several
@@ -83,12 +82,17 @@ Android System Development Training\\
     \item {\bf PC computers with valuable data must be backed up}
       before being used in our sessions. Some people have already made
       mistakes during our sessions and damaged work data.
+    \item It is a good idea to do a fresh install on a new disk
+      which subsuquently can be used as an external USB disk.
     \end{itemize} \vspace{-0.7cm} \\
     \hline
 
     {\bf Materials} & Print and electronic copies of presentations and
     labs.
     \newline Electronic copy of lab files.\\
+    \hline
+
+    {\bf Credits} & This material is developed by Free-Electrons \localauthor .\\
     \hline
 
 \end{tabularx}}
