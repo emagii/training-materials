@@ -1,0 +1,45 @@
+The default page layout is “portrait”, but sometimes it is still useful/necessary to have the whole document or only single pages changed to “landscape”. The latter might be due to a large table or figure. This post will tell you how to change the page layout of the whole document or single pages to “landscape”. In addition, it is possible to make single pages appear left side up in the PDF, making them more readable.
+
+Changing the whole document to “landscape” can be done be using the geometry-package:
+1
+
+\usepackage[landscape]{geometry}
+
+You can also just change the page content to landscape, but not the actual page layout through the optional argument of the command “documentclass”. It does not make much sense, but you can do it:
+1
+
+\documentclass[landscape, 12pt]{report}
+
+Next I will show you how to change the page layout of single pages. The lscape-package provides according possiblities:
+1
+
+\usepackage{lscape}
+
+With
+1
+2
+3
+
+\begin{landscape}
+...
+\end{landscape}
+
+you define the section of your document to be set to “landscape”, e.g. a large table or figure.
+
+This will not automatically rotate the page in the PDF and is useful if the document is destined for printing.
+
+If you want to make appear the left side up, better readable on screen, the pdflscape-package will do it:
+1
+
+\usepackage{pdflscape}
+
+and again:
+1
+2
+3
+
+\begin{landscape}
+...
+\end{landscape}
+
+for the page to be “landscape”, while the rest will remain in “portrait” orientation. Nevertheless, the header/footer will also be changed in orientation.

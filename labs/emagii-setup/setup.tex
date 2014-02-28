@@ -1,0 +1,71 @@
+\subchapter{Training setup}{Download files and directories used in practical labs}
+
+\section{Install lab data}
+
+For the different labs in the training, your instructor has prepared a
+set of data (kernel images, kernel configurations, root filesystems
+and more). Download and extract its tarball from a terminal:
+
+
+{\small
+{\tt
+cd \\
+wget \sessionurl/labs.tar.xz \\
+sudo tar Jxf labs.tar.xz \\
+sudo chown -R <user>.<user> \labdir \\
+}
+}
+
+Note that using \code{root} permissions are required to extract the
+character and block device files contained in this lab archive. This is
+an exception. For all the other archives that you will handle during
+the practical labs, you will never need \code{root} permissions to
+extract them. If there is another exception, we will let you know.
+
+Lab data are now available in an \code{\labdir} directory in your home
+directory. For each lab there is a directory containing various
+data. This directory will also be used as working space for each lab,
+so that the files that you produce during each lab are kept separate.
+
+You are now ready to start the real practical labs!
+
+\section{Install extra packages}
+
+Ubuntu comes with a very limited version of the \code{vi}
+editor. Install \code{vim}, a improved version of this editor.
+
+\begin{verbatim}
+sudo apt-get install vim
+\end{verbatim}
+
+\section{More guidelines}
+
+Can be useful throughout any of the labs
+
+\begin{itemize}
+
+\item Read instructions and tips carefully. Lots of people make
+  mistakes or waste time because they missed an explanation or a
+  guideline.
+
+\item Always read error messages carefully, in particular the first
+  one which is issued. Some people stumble on very simple errors just
+  because they specified a wrong file path and didn't pay enough
+  attention to the corresponding error message.
+
+\item Never stay stuck with a strange problem more than 5
+  minutes. Show your problem to your colleagues or to the instructor.
+
+\item You should only use the \code{root} user for operations that require
+  super-user privileges, such as: mounting a file system, loading a
+  kernel module, changing file ownership, configuring the
+  network. Most regular tasks (such as downloading, extracting
+  sources, compiling...) can be done as a regular user.
+
+\item If you ran commands from a root shell by mistake, your regular
+  user may no longer be able to handle the corresponding generated
+  files. In this case, use the \code{chown -R} command to give the new
+  files back to your regular user.\\
+  Example: \code{chown -R myuser.myuser linux-3.4}
+
+\end{itemize}
