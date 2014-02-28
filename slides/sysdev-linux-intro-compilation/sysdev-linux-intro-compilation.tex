@@ -2,13 +2,32 @@
   kernel for the host system}
 
 \begin{frame}
+  \frametitle{Getting the Linux source on Ubuntu}
+  \begin{itemize}
+  \item \code{$ sudo apt-get install linux-source}\\
+  will install the source in \code{/usr/src}\\
+  \code{ }\\
+  Copy the appropriate config file from \code{/boot} to \code{/usr/src/linux-x.y.z}\\
+  \code{ }\\
+  \code{$ make oldconfig}\\
+  \code{ }\\
+  \code{ }\\
+  \code{ }\\
+  \code{ }\\
+  \code{ }\\
+  \code{ }\\
+  \code{ }
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Kernel compilation}
   \begin{itemize}
   \item \code{make}
     \begin{itemize}
     \item in the main kernel source directory
-    \item Remember to run \code{make -j 4} if you have multiple CPU
-      cores to speed up the compilation process
+    \item Remember to run \code{make -j <n>} if you have multiple CPU
+      cores to speed up the compilation process (n typical 4)
     \item No need to run as root!
     \end{itemize}
   \item Generates
@@ -32,7 +51,7 @@
 \begin{frame}
   \frametitle{Kernel installation}
   \begin{itemize}
-  \item \code{make install}
+  \item \code{sudo make install}
     \begin{itemize}
     \item Does the installation for the host system by default, so
       needs to be run as root. Generally not used when compiling for
@@ -57,7 +76,7 @@
 \begin{frame}
   \frametitle{Module installation}
   \begin{itemize}
-  \item \code{make modules_install}
+  \item \code{$ sudo make modules_install}
     \begin{itemize}
     \item Does the installation for the host system by default, so
       needs to be run as root
