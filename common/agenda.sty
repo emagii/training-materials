@@ -32,8 +32,10 @@
 \fancyhead[CO, CE]{\includegraphics[width=\textwidth]{header.png}}
 \fancyfoot[RO, LE] {\thepage}
 
-\definecolor{fedarkblue}{RGB}{204,204,255}
-\definecolor{felightblue}{RGB}{230,230,255}
+
+\definecolor{darkagendacolor}{RGB}{204,204,255}
+%% Light Blue
+\definecolor{lightagendacolor}{RGB}{230,230,255}
 
 \renewcommand{\headrulewidth}{0pt}
 \renewcommand{\footrulewidth}{0.5pt}
@@ -67,6 +69,16 @@
 \newcommand{\cellstart}{\rule{0pt}{\heightof{A}+1ex}}
 \newcommand{\cellfinish}{\rule[-1ex]{0pt}{1ex}}
 
+\newcommand\vendor{Free-Electrons}
+\newcommand\kerneltrainers{One of the engineers listed on}
+\newcommand\trainingurl{\url{http://free-electrons.com/training/trainers/}}
+
+\newcommand{\locallanguage}{French or German}
+\newcommand\localauthor{}
+\newcommand\hostos{Ubuntu Desktop 12.04 (32 or 64 bit, Xubuntu and Kubuntu variants are fine)}
+\newcommand\hostmachine{Intel Core i5 }
+\newcommand\hostfreespace{50 GB}
+
 \renewcommand{\tabularxcolumn}[1]{>{\cellstart}m{#1}<{\cellfinish}}
 
 %% Define a one column array. Two arguments are needed:
@@ -74,9 +86,9 @@
 %%  second argument: the contents of the section
 \newcommand\feagendaonecolumn[2]{
 \begin{tabularx}{\textwidth}{X}
-  \rowcolor{fedarkblue}
+  \rowcolor{darkagendacolor}
   {\bf #1} \\
-  \rowcolor{felightblue}
+  \rowcolor{lightagendacolor}
   #2 \\
 \end{tabularx}
 \vspace{0.5cm}
@@ -89,9 +101,9 @@
 %%  fourth argument: The contents of the section in the right column
 \newcommand\feagendatwocolumn[4]{
 \begin{tabularx}{\textwidth}{X X}
-  \rowcolor{fedarkblue}
+  \rowcolor{darkagendacolor}
   {\bf #1} & {\bf #3} \\
-  \rowcolor{felightblue}
+  \rowcolor{lightagendacolor}
   #2 & #4 \\
 \end{tabularx}
 \vspace{0.5cm}
