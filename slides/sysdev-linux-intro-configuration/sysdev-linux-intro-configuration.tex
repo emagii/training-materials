@@ -17,7 +17,7 @@
   \item Example
     \begin{itemize}
     \item \code{cd linux-3.6.x/}
-    \item \code{make <target>}
+    \item \code{make <target>_defconfig}
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -56,9 +56,29 @@
     \item You can switch from one to another, they all load/save the
       same \code{.config} file, and show the same set of options
     \end{itemize}
+  \item You need to set the \code{ARCH} environment variable before you
+      try to \code{make <target>} unless you are configuring an x86 host kernel
+  \item Example
+    \begin{itemize}
+    \item \code{export ARCH=arm}
+    \item \code{make xconfig &}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Rebuilding the host kernel}
+  \begin{itemize}
+  \item To modify a kernel in a GNU/Linux distribution: you first have to
+    download the kernel source, usually to \code{/usr/src}
   \item To modify a kernel in a GNU/Linux distribution: the
-    configuration files are usually released in \code{/boot/},
-    together with kernel images: \code{/boot/config-3.2.0-31-generic}
+    configuration file should be copied from \code{/boot/}, where it is
+    stored together with kernel images to \code{.config}
+  \item A typical config file would be named \code{/boot/config-3.2.0-31-generic}
+  \item If the \code{.config} file is edited manually, it is recommended to afterwards run
+    \begin{itemize}
+    \item \code{make oldconfig}
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -89,7 +109,23 @@
 \end{frame}
 
 \begin{frame}
-  \frametitle{Kernel option types}
+  \frametitle{Kbuild}
+  \begin{itemize}
+  \item The {\bf Kbuild} configuration system reads in the options
+     from a large set of files, each typically called {\bf Kconfig}.
+     Most kernel directories contain a {\bf Kconfig} file.
+  \item The {\bf Kconfig} files can include other {\bf Kconfig} files.
+  \item A configuration item is defined through the {\bf config} command
+    \begin{itemize}
+    \item \code{config OMAP_USB_HOST}
+    \item \code{ }\code{	<option> "OMAP USB host controller"}
+    \item \code{ }\code{	default y}
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Kbuild option types}
   \begin{itemize}
   \item There are different types of options
     \begin{itemize}
@@ -506,5 +542,22 @@ CONFIG_NTFS_RW=y
     \begin{itemize}
     \item Debugging features useful for kernel developers
     \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Normal ways of generating the .config file}
+  \begin{itemize}
+  \item Typically the kernel build is done by a buildsystem
+    which will have a ready made configuration for a target.
+  \item Often, there is no need to change this configuration
+  \item If there is a need to change, then the configuration is
+     changed in the kernel build directory of the build system
+  \item The resulting .config file is then copied to the
+     appropriate place inside the buildsystem meta-data.
+  \item For separate builds, the kernel contains a large number of predefined configurations
+    which can be used to create an initial .config file\\
+    \code{$ make beaglebone_defconfig}\\
+    will create a \code{.config} file supporting the \code{beaglebone} board
   \end{itemize}
 \end{frame}
