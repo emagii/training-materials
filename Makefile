@@ -1,8 +1,15 @@
 # Required packages (tested on Ubuntu 12.04):
 # inkscape texlive-latex-base texlive-font-utils dia python-pygments
 
-VENDOR?=common
-
+ifeq ($(VENDOR),)
+ifeq ($(HOME),/home/ulf)
+$(warning "Setting VENDOR to eMagii")
+VENDOR=eMagii
+else
+$(warning "Setting VENDOR to common")
+VENDOR=common
+endif
+endif
 # Init some help variables, each slideshow/lab will add to these
 HELPER=help-header
 AGENDAS=agenda-help
