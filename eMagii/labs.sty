@@ -25,6 +25,11 @@
 %% Have straight quotes instead of curly ones in verbatim mode
 \usepackage{upquote}
 
+\usepackage{listings}
+
+\usepackage{lstautogobble}
+\usepackage{lstlinebgrd}
+
 % Extensions
 \RequirePackageWithOptions{inputenc}
 
@@ -64,12 +69,13 @@
 \newcommand{\@trainingurl}{}
 
 \newcommand{\@feurl}{http://free-electrons.com}
+\newcommand{\@emurl}{http://www.emagii.com}
 \newcommand{\@cchref}
 {
   \href{http://creativecommons.org/licenses/by-sa/3.0/}{Creative Commons CC BY-SA 3.0 license}
 }
 
-\author{Free Electrons \\\url{\@feurl}}
+\author{eMagii \\\url{\@emurl} \\ \\Free Electrons \\\url{\@feurl}}
 
 \newcommand{\@ccimg}{eMagii/logo-cc.pdf}
 
@@ -82,6 +88,8 @@
 {
   \renewcommand{\@ccimg}{#1}
 }
+
+\newcommand{\codesourcery}{Sourcery Codebench Lite 2013.11-33 }
 
 %% Define the url style
 \hypersetup{colorlinks=true, urlcolor=blue, linkcolor=blue}
@@ -101,9 +109,11 @@
 \renewcommand{\headrulewidth}{0.5pt}
 \renewcommand{\footrulewidth}{0.5pt}
 
-\fancyhead[LE,LO]{Free Electrons}
+\fancyhead[LE,LO]{eMagii, Free Electrons}
 \fancyhead[RE,RO]{\labbooktitle}
-\fancyfoot[RE,LO]{\copyright~2004-\the\year~\href{http://free-electrons.com}{Free Electrons}, CC BY-SA license}
+\fancyfoot[RE,LO]{\copyright~2004-\the\year~
+\href{http://free-electrons.com}{Free Electrons}
+\href{http://www.emagii.com}{eMagii}, CC BY-SA license}
 \fancyfoot[LE,RO]{\thepage}
 
 \fancypagestyle{plain}{%
@@ -134,7 +144,7 @@
 
   This document was generated from LaTeX sources found on \url{http://git.free-electrons.com/training-materials}.
 
-  More details about our training sessions can be found on \url{http://free-electrons.com/training}.
+  More details about our training sessions can be found on \url{http://www.emagii.com/training}.
 
   \section{Copying this document}
 
