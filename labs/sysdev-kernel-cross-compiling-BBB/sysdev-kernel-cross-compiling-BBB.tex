@@ -1,0 +1,285 @@
+\subchapter{Kernel - Cross-compiling}{Objective: Learn how to cross-compile a kernel for a Beaglebone Black board.}
+
+After this lab, you will be able to:
+\begin{itemize}
+\item Set up a cross-compiling environment
+\item Configure the kernel Makefile accordingly
+\item Cross compile the kernel for the IGEPv2 arm board
+\item Use U-Boot to download the kernel
+\item Check that the kernel you compiled starts the system
+\end{itemize}
+
+\section{Setup}
+
+Go to the \code{$HOME/felabs/sysdev/kernel} directory.
+
+Install the required packages:
+
+\code{sudo apt-get install libqt4-dev u-boot-tools}
+
+\code{libqt4-dev} is needed for the \code{xconfig} kernel configuration interface, and \code{u-boot-tools}
+is needed to build an \code{uImage} kernel image file for U-Boot.
+
+You should remove libqt3 development packages, using Synaptic if already present.
+
+\section{Target system}
+
+We are going to cross-compile and boot a Linux kernel for the Beaglebone Black
+board.
+
+\section{Kernel sources}
+
+We will re-use the kernel sources downloaded and patched in the
+previous lab.
+
+\section{Cross-compiling environment setup}
+
+To cross-compile Linux, you need to have a cross-compiling
+toolchain. We will use the cross-compiling toolchain that we
+previously produced, so we just need to make it available in the PATH:
+
+\begin{verbatim}
+export PATH=/usr/local/xtools/arm-unknown-linux-uclibcgnueabi/bin:$PATH
+\end{verbatim}
+
+Also, don't forget to either:
+
+\begin{itemize}
+\item Define the value of the \code{ARCH} and \code{CROSS_COMPILE}
+  variables in your environment (using \code{export})
+\item {\bf Or} specify them on the command line at every invocation of
+  \code{make}, i.e: \code{make ARCH=... CROSS_COMPILE=... <target>}
+\end{itemize}
+
+\section{Linux kernel configuration}
+
+Find the proper Makefile target to configure the kernel for the Beaglebone Black board 
+(hint: the default configuration is not named after the board, but after the CPU
+name=AM33XX). The configuration files are in \code{arch/arm/configs}
+
+Once found, use this target to configure the kernel with the
+ready-made configuration through:
+
+\code{make <board>_defconfig}
+
+Don't hesitate to visualize the new settings by running
+\code{make xconfig} afterwards!
+
+This may fail, if libqt3 is installed and used during make.
+Deinstall libqt3 headers and retry.
+
+If you get mystic error messages regarding \code{qt-mt.pc}
+you may have to reset by \code{make distclean} and redo:
+
+\code{make <board>_defconfig}
+
+In the kernel configuration:
+
+\begin{itemize}
+
+\item In the \code{System Type} menu, make sure that \code{TI AM33XX} is selected.
+  Otherwise, you do not have the correct \code{<board>_defconfig}
+  We will boot our kernel with a device tree for our board so
+  technically speaking, you can leave this option enabled,
+  and still boot using a {\em Device Tree}, 
+
+\item As an experiment, let's change the kernel compression from Gzip
+  to XZ. This compression algorithm is far more efficient than Gzip,
+  in terms of compression ratio, at the expense of a higher
+  decompression time. You find XZ in the \code{General Setup} menu.
+
+\end{itemize}
+
+\section{Cross compiling}
+
+You're now ready to cross-compile your kernel. Simply run:
+
+\begin{verbatim}
+make LOADADDR=0x80008000 zImage
+\end{verbatim}
+
+The \code{LOADADDR} indicates to U-Boot where the kernel image should
+be loaded.
+
+and wait a while for the kernel to compile. Don't forget to use
+\code{make -j<n>} if you have multiple cores on your machine!
+
+Look at the end of the kernel build output to see which file contains
+the kernel image. You can also see the Device Tree \code{.dtb} files
+which got compiled. Find which \code{.dtb} file corresponds to your
+board.
+
+\section{Setting up serial communication with the board}
+
+Plug the Beaglebone Black board on your computer. Start Picocom on
+\code{/dev/ttyS0}, or on \code{/dev/ttyUSB0} if you are using a serial
+to USB adapter.
+
+\begin{verbatim}
+$ picocom -b 115200 /dev/ttyUSB0
+\end{verbatim}
+
+You should now see the U-Boot prompt:
+
+\begin{verbatim}
+U-Boot #
+\end{verbatim}
+
+Make sure that the bootargs U-Boot environment variable is not set (it
+could remain from a previous training session, and this could disturb
+the next lab):
+
+\begin{verbatim}
+setenv bootargs
+saveenv
+\end{verbatim}
+
+\section{Load and boot the kernel using U-Boot}
+
+We will use TFTP to load the kernel image to the IGEP board:
+
+\begin{itemize}
+
+\item On your workstation, copy the \code{uImage} and DTB files to the
+  directory exposed by the TFTP server.
+
+\item On the target, load \code{zImage} from TFTP into RAM at address
+  0x80000000:\\
+  \code{tftp 0x80000000 zImage}
+
+\item Now, also load the DTB file into RAM at address 0x81000000:\\
+  \code{tftp 0x81000000 am335x-boneblack.dtb}
+
+\item Boot the kernel with its device tree:\\
+  \code{bootz 0x80000000 - 0x81000000}
+
+\end{itemize}
+
+You should see Linux boot and finally hang with the following message:
+
+\begin{verbatim}
+Waiting for root device /dev/mmcblk0p2...
+\end{verbatim}
+
+This is expected: we haven't provided a working root filesystem for
+our device yet.
+
+You can now automate all this every time the board is booted or
+reset. Remove the micro-SD card and connect it to your host.
+
+Add the following to your \code{uEnv.txt}. Remember to run \code{sync} before removing the card.
+
+{\scriptsize
+\begin{verbatim}
+uenvcmd=tftp 80000000 zImage; tftp 81000000 am335x-boneblack.dtb; bootz 80000000 - 81000000
+\end{verbatim}
+}
+
+Reinsert the card in the Beaglebone Black and type
+
+{\scriptsize
+\begin{verbatim}
+reset
+\end{verbatim}
+}
+
+Check the date of the U-Boot build time. It will still be your own U-Boot, unless you
+removed power.
+
+On a system with NAND flash, you could do:
+{\scriptsize
+\begin{verbatim}
+ setenv 'tftp 80000000 zImage; tftp 81000000 am335x-boneblack.dtb; bootz 80000000 - 81000000'
+ saveenv
+\end{verbatim}
+}
+
+\section{Flashing the kernel and DTB in NAND flash (Skip))}
+
+On a system with NAND Flash, you can program the kernel into the flash
+after downloading with TFTP. The Beaglebone Black does not have NAND Flash
+so this section is for reference only. Read through, but do not perform the commands.
+
+In order to let the kernel boot on the board autonomously we can,
+on a board with NAND flash, flash the kernel image and DTB in the NAND flash. 
+See the bootloader lab for details about U-boot's \code{nand} command.
+
+After storing the first stage bootloader, U-boot and its environment
+variables, we will keep special areas in NAND flash for the DTB
+and Linux kernel images:
+
+\begin{center}
+  \includegraphics[width=\textwidth]{labs/sysdev-kernel-cross-compiling/flash-map.pdf}
+\end{center}
+
+So, let's start by erasing the corresponding 128 KiB of NAND flash
+for the DTB:
+
+\begin{verbatim}
+nand erase 0x2e0000 0x20000
+        (NAND offset) (size)
+\end{verbatim}
+
+Then, let's erase the 5 MiB of NAND flash for the kernel image:
+
+\begin{verbatim}
+nand erase 0x300000 0x500000
+\end{verbatim}
+
+Then, copy the DTB and kernel binaries from TFTP into memory, using the
+same addresses as before.
+
+Then, flash the DTB and kernel binaries:
+
+\begin{verbatim}
+nand write 0x81000000 0x2e0000 0x20000
+           (RAM addr) (NAND offset) (size)
+nand write 0x80000000 0x300000 0x500000
+\end{verbatim}
+
+Power your board off and on, to clear RAM contents. We should now be
+able to load the DTB and kernel image from NAND and boot with:
+
+\begin{verbatim}
+nand read 0x81000000 0x2e0000 0x20000
+nboot 0x80000000 0        0x300000
+      (RAM addr) (device) (NAND offset)
+bootm 0x80000000 - 0x81000000
+\end{verbatim}
+
+NAND boot \code{nboot} copies the kernel to RAM, using the \code{uImage} headers
+to know how many bytes to copy. You could have used \code{nand read
+0x80000000 0x300000 0x500000}, but you would have copied more bytes than
+the actual size of your kernel. \footnote{\code{nboot} can save a lot 
+of boot time, as it avoids having to copy a pessimistic number of
+bytes from flash to RAM}. Modern Linux uses \code{zImage} which is not
+supported by \code{nboot}, so the command is not appropriate for newer kernels.
+
+When TFTP downloads a file, it will store the size of the file in the 'filesize'
+environment variable. The value can be stored in another variable, I.E: 'kernel\_size'
+
+\begin{verbatim}
+tftp 80000000 zImage; 
+setenv kernel_size $filesize
+tftp 81000000 am335x-boneblack.dtb; 
+setenv dtb_size $filesize
+\end{verbatim}
+
+This can be used to retreive the files without redundant reads:
+
+\begin{verbatim}
+nand read 0x80000000 0x300000 $kernel_size
+nand read 0x81000000 0x2e0000 $dtb_size
+bootz 80000000 - 81000000
+\end{verbatim}
+
+Note that U-boot is not always configured
+with \code{nboot} support.
+
+Write a U-Boot script that automates the DTB + kernel download
+and flashing procedure. Finally, adjust \code{bootcmd} so that
+the board boots using the kernel in Flash.
+
+Now, power off the board and power it on again to check that it boots
+fine from NAND flash. Check that this is really your own version of
+the kernel that's running.
