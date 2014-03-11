@@ -3,7 +3,7 @@ SYSDEV_LABS   = setup \
 		sysdev-u-boot-BBB \
 		sysdev-kernel-fetch-and-patch \
 		sysdev-kernel-cross-compiling-BBB \
-		sysdev-tinysystem \
+		sysdev-tinysystem-BBB \
 		sysdev-block-filesystems \
 		sysdev-flash-filesystems \
 		sysdev-thirdparty \
