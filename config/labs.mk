@@ -3,6 +3,7 @@
 #
 
 include	config/labs/*.mk
+include	config/labs/$(VENDOR)/*.mk
 
 ifdef LABS
 LABS_HEADER        = ${VENDOR}/labs-header.tex

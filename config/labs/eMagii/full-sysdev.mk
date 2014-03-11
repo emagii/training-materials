@@ -1,8 +1,8 @@
 SYSDEV_LABS   = setup \
-		sysdev-toolchain \
-		sysdev-u-boot \
+		sysdev-toolchain-BBB \
+		sysdev-u-boot-BBB \
 		sysdev-kernel-fetch-and-patch \
-		sysdev-kernel-cross-compiling \
+		sysdev-kernel-cross-compiling-BBB \
 		sysdev-tinysystem \
 		sysdev-block-filesystems \
 		sysdev-flash-filesystems \

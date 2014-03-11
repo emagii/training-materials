@@ -1,3 +1,5 @@
+ifeq ($(VENDOR),common)
+
 KERNEL_LABS   = setup \
 		kernel-sources-download \
 		kernel-sources-exploring \
@@ -23,9 +25,11 @@ LABS_CONFIGURED	   = yes
 endif
 endif
 
+full-kernel-labs.pdf:	SESSION_URL="http://free-electrons.com/doc/training/embedded-linux"
+
 full-kernel-labs-help:
 	$(HELP) "full-kernel-labs.pdf"			"Complete labs for the 'kernel' course"
 
 LAB_HELPER+=full-kernel-labs-help
 
-
+endif
