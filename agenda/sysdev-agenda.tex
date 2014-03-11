@@ -1,0 +1,500 @@
+\documentclass[a4paper,12pt,obeyspaces,spaces,hyphens]{article}
+
+\usepackage{agenda}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{palatino}
+\usepackage{calc}
+
+\hypersetup{pdftitle={Embedded Linux system development},
+  pdfauthor={\vendor}}
+
+\begin{document}
+
+\thispagestyle{fancy}
+
+\setlength{\arrayrulewidth}{0.8pt}
+
+\begin{center}
+\LARGE
+Embedded Linux system development\\
+\large
+5-day session
+\end{center}
+\vspace{1cm}
+
+\small
+\newcolumntype{g}{>{\columncolor{darkagendacolor}}m{4cm}}
+\newcolumntype{h}{>{\columncolor{lightagendacolor}}X}
+
+\arrayrulecolor{lightgray} {
+  \setlist[1]{itemsep=-5pt}
+  \begin{tabularx}{\textwidth}{|g|h|}
+    {\bf Title} & Embedded Linux system development \\
+    \hline
+
+    {\bf Overview} &
+    Introduction to Embedded Linux \par
+    Cross-Compiling Toolchains \par
+    Bootloaders \par
+    Linux Kernel Introduction \par
+    Linux Root Filesystems \par
+    Embedded Linux System Development \par
+    Embedded Linux Application Development \par
+    Real Time in Embedded Linux Systems \par
+    Practical labs with the ARM-based Beagle Bone Black.\\
+    \hline
+
+    {\bf Duration} & {\bf Five} days - 40 hours (8 hours per day).
+    \newline 50\% of lectures, 50\% of practical labs. \\
+    \hline
+
+    {\bf Trainer} & \kerneltrainers
+    \newline \trainingurl\\
+    \hline
+
+    {\bf Language} & Oral lectures: English, \locallanguage.
+    \newline Materials: English.\\
+    \hline
+
+    {\bf Audience} & People developing devices using Linux
+    \newline People supporting embedded Linux system developers. \\
+    \hline
+
+    {\bf Prerequisites} &
+
+    {\bf Solid experience in C programming}
+    \newline In particular, participants must be familiar
+    with creating and dealing with complex data types and structures,
+    with pointers to such symbols, as well as with function pointers.
+    \newline {\bf Knowledge and practice of UNIX or GNU/Linux commands}
+    \newline People lacking experience on this topic should get
+    trained by themselves with our freely available on-line slides
+    (\url{http://free-electrons.com/docs/command-line/}).
+    \newline {\bf Experience in embedded Linux development}.
+    \newline Taking our Embedded Linux course
+    (\url{http://free-electrons.com/training/embedded-linux/})
+    first is not an absolute prerequisite, but it will definitely
+    help people lacking embedded Linux development experience.
+    They will understand the development environment
+    and board manipulations better, allowing them to concentrate on
+    kernel code programming.
+    \\
+    \hline
+  \end{tabularx}
+
+  \begin{tabularx}{\textwidth}{|g|h|}
+    {\bf Required equipment} &
+    {\bf For on-site sessions only}
+    \newline Everything is supplied by \vendor \hspace{1 mm}
+    in public sessions.
+    \begin{itemize}
+    \item Video projector 
+    \item PC computers with at least 2 GB of RAM, and Ubuntu Linux 12.04
+    installed in a {\bf free partition of at least 20 GB}. We don't support other
+    distributions, because we can't test all possible package versions.
+    {\bf Using Linux in a virtual machine is not supported}, because of issues
+    connecting to real hardware.
+
+    \item We need \hostmachine or better.
+    \item {\bf Connection to the Internet} (direct or through the
+    company proxy).
+    \item {\bf PC computers with valuable data must be backed up}
+    before being used in our sessions.  Some people have already made
+    mistakes during our sessions and damaged work data.
+    \item It is a good idea to do a fresh install on a new disk
+      which subsuquently can be used as an external USB disk.
+    \end{itemize} \\
+    \hline
+
+    {\bf Materials} & Print and electronic copies of presentations and
+    labs.
+    \newline Electronic copy of lab files.\\
+    \hline
+
+    {\bf Credits} & This material is developed by Free-Electrons \localauthor .\\
+    \hline
+
+\end{tabularx}}
+\normalsize
+
+\feagendatwocolumn
+{Hardware}
+{
+  The hardware platform used for the practical labs of this training
+  session is the {\bf BeagleBone Black}, which features:
+
+  \begin{itemize}
+  \item An ARM AM335x processor from Texas Instruments (Cortex-A8
+    based), 3D acceleration, etc.
+  \item 512 MB of RAM
+  \item 2 GB of on-board eMMC storage
+  \item USB host and device
+  \item HDMI output
+  \item 2 x 46 pins headers, to access UARTs, SPI busses, I2C busses
+    and more.
+  \end{itemize}
+}
+{}
+{
+  \begin{center}
+    \includegraphics[height=5cm]{agenda/beagleboneblack.png}
+  \end{center}
+}
+
+\feagendaonecolumn
+{Labs}
+{
+  The practical labs of this training session use the following
+  hardware peripherals to illustrate the development of Linux device
+  drivers:
+
+  \begin{itemize}
+  \item A high-speed micro-SD card (minimum 4 GB)
+  \item A SD-Card Reader
+  \item USB - Ethernet adapter.
+      The Ethernet will be reconfigured, and if you do not 
+      want to change your normal setup, an USB - Ethernet adapter is OK.
+  \item USB - Serial Adapter
+  \item Two free USB ports for USB, or an external powered USB hub.
+  \end{itemize}
+}
+
+\clearpage
+\section{Day 1 - Morning}
+
+\feagendaonecolumn
+{Lecture - Introduction to the Linux kernel}
+{
+  \begin{itemize}
+  \item Kernel features
+  \item Understanding the development process.
+  \item Legal constraints with device drivers.
+  \item Kernel user interface (/proc and /sys)
+  \item Userspace device drivers
+  \end{itemize}
+}
+\\
+\feagendatwocolumn
+{Lecture - Kernel sources}
+{
+  \begin{itemize}
+  \item Specifics of Linux kernel development
+  \item Coding standards
+  \item Retrieving Linux kernel sources
+  \item Tour of the Linux kernel sources
+  \item Kernel source code browsers: cscope, Kscope, Linux Cross
+    Reference (LXR)
+  \end{itemize}
+}
+{Lab - Kernel sources}
+{
+  \begin{itemize}
+  \item Making searches in the Linux kernel sources: looking for C
+    definitions, for definitions of kernel configuration parameters,
+    and for other kinds of information.
+  \item Using the Unix command line and then kernel source code
+    browsers.
+ \end{itemize}
+}
+
+\section{Day 1 - Afternoon}
+\feagendatwocolumn
+{Lecture - Configuring, compiling and booting the Linux kernel}
+{
+  \begin{itemize}
+  \item Kernel configuration.
+  \item Native and cross-compilation. Generated files.
+  \item Booting the kernel. Kernel booting parameters.
+  \item Booting the kernel using NFS.
+  \end{itemize}
+}
+{Lab - Kernel configuration, cross-compiling and booting on NFS}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Configuring, cross-compiling and booting a Linux kernel with
+    NFS boot support.
+  \end{itemize}
+}
+\\
+\clearpage
+\section{Day 2 - Morning}
+
+\feagendatwocolumn
+{Lecture - Linux kernel modules}
+{
+  \begin{itemize}
+  \item Linux device drivers
+  \item A simple module
+  \item Programming constraints
+  \item Loading, unloading modules
+  \item Module dependencies
+  \item Adding sources to the kernel tree
+  \end{itemize}
+}
+{Lab - Writing modules}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Write a kernel module with several capabilities.
+  \item Access kernel internals from your module.
+  \item Setup the environment to compile it
+  \end{itemize}
+}
+
+\section{Day 2 - Afternoon}
+
+\feagendatwocolumn
+{Lecture - Linux device model}
+{
+  \begin{itemize}
+  \item Understand how the kernel is designed to support device
+    drivers
+  \item The device model
+  \item Binding devices and drivers
+  \item Platform devices, Device Tree
+  \item Interface in userspace: \code{/sys}
+  \end{itemize}
+}
+{Lab - Linux device model for an I2C driver}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Implement a driver that registers as an I2C driver
+  \item Modify the Device Tree to list an I2C device
+  \item Get the driver called when the I2C device is enumerated at
+    boot time
+  \end{itemize}
+}
+
+\clearpage
+\section{Day 3 - Morning}
+
+\feagendatwocolumn
+{Lecture - Introduction to the I2C API}
+{
+  \begin{itemize}
+  \item The I2C subsystem of the kernel
+  \item Details about the API provided to kernel drivers to interact
+    with I2C devices
+  \end{itemize}
+}
+{Lecture - Pin muxing}
+{
+  \begin{itemize}
+  \item Understand the {\em pinctrl} framework of the kernel
+  \item Understand how to configure the muxing of pins
+  \end{itemize}
+}
+
+\feagendaonecolumn
+{Lab - Communicate with the Nunchuk over I2C}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Configure the pin muxing for the I2C bus used to communicate
+    with the Nunchuk
+  \item Extend the I2C driver started in the previous lab to
+    communicate with the Nunchuk via I2C
+  \end{itemize}
+}
+
+\section{Day 3 - Afternoon}
+
+\feagendaonecolumn
+{Lecture - Kernel frameworks}
+{
+  \begin{itemize}
+  \item Block vs. character devices
+  \item Interaction of userspace applications with the kernel
+  \item Details on character devices, \code{file_operations}, \code{ioctl()}, etc.
+  \item Exchanging data to/from userspace
+  \item The principle of kernel frameworks
+  \end{itemize}
+}
+
+\feagendatwocolumn
+{Lecture - The input subsystem}
+{
+  \begin{itemize}
+  \item Principle of the kernel {\em input} subsystem
+  \item API offered to kernel drivers to expose input devices
+    capabilities to userspace application
+  \item Userspace API offered by the {\em input} subsystem
+  \end{itemize}
+}
+{Lab - Expose the Nunchuk functionality to userspace}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Extend the Nunchuk driver to expose the Nunchuk features to
+    userspace applications, as a {\em input} device.
+  \item Test the operation of the Nunchuk using sample userspace
+    applications
+  \end{itemize}
+}
+
+\clearpage
+\section{Day 4 - Morning}
+
+\feagendatwocolumn
+{Lecture - Memory management}
+{
+  \begin{itemize}
+  \item Linux: memory management - Physical and virtual (kernel and user) address spaces.
+  \item Linux memory management implementation.
+  \item Allocating with \code{kmalloc()}.
+  \item Allocating by pages.
+  \item Allocating with \code{vmalloc()}.
+  \end{itemize}
+}
+{Lecture - I/O memory and ports}
+{
+  \begin{itemize}
+  \item I/O register and memory range registration.
+  \item I/O register and memory access.
+  \item Read / write memory barriers.
+  \end{itemize}
+}
+
+\feagendaonecolumn
+{Lab - Minimal platform driver and access to I/O memory}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Implement a minimal platform driver
+  \item Modify the Device Tree to instantiate the new serial port
+    device.
+  \item Reserve the I/O memory addresses used by the serial port.
+  \item Read device registers and write data to them, to send
+    characters on the serial port.
+  \end{itemize}
+}
+
+\section{Day 4 - Afternoon}
+
+\feagendatwocolumn
+{Lecture - The misc kernel subsystem}
+{
+  \begin{itemize}
+  \item What the {\em misc} kernel subsystem is useful for
+  \item API of the {\em misc} kernel subsystem, both the kernel side
+    and userspace side
+  \end{itemize}
+}
+{Lab - Output-only serial port driver}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Extend the driver started in the previous lab by registering
+    it into the {\em misc} subsystem
+  \item Implement serial port output functionality through the {\em
+      misc} subsystem
+  \item Test serial output from userspace
+  \end{itemize}
+}
+
+\feagendatwocolumn
+{Lecture - Processes, scheduling, sleeping and interrupts}
+{
+  \begin{itemize}
+  \item Process management in the Linux kernel.
+  \item The Linux kernel scheduler and how processes sleep.
+  \item Interrupt handling in device drivers: interrupt handler
+    registration and programming, scheduling deferred work.
+  \end{itemize}
+}
+{Lab - Sleeping and handling interrupts in a device driver}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Adding read capability to the character driver developed
+    earlier.
+  \item Register an interrupt handler.
+  \item Waiting for data to be available in the read file operation.
+  \item Waking up the code when data is available from the device.
+  \end{itemize}
+}
+
+\clearpage
+\section{Day 5 - Morning}
+
+\feagendatwocolumn
+{Lecture - Locking}
+{
+  \begin{itemize}
+  \item Issues with concurrent access to resources
+  \item Locking primitives: mutexes, semaphores, spinlocks.
+  \item Atomic operations.
+  \item Typical locking issues.
+  \item Using the lock validator to identify the sources of locking
+    problems.
+  \end{itemize}
+}
+{Lab - Locking}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Observe problems due to concurrent accesses to the device.
+  \item Add locking to the driver to fix these issues.
+  \end{itemize}
+}
+
+\feagendatwocolumn
+{Lecture - Driver debugging techniques}
+{
+  \begin{itemize}
+  \item Debugging with printk
+  \item Debugfs entries
+  \item Analyzing a kernel oops
+  \item Using kgdb, a kernel debugger
+  \item Using the Magic SysRq commands
+  \item Debugging through a JTAG probe
+  \end{itemize}
+}
+{Lab - Investigating kernel faults}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Studying a broken driver.
+  \item Analyzing a kernel fault and locating the problem in the
+    source code.
+  \end{itemize}
+}
+
+\section{Day 5 - Afternoon}
+
+\feagendatwocolumn
+{Lecture - ARM board support and SoC support}
+{
+  \begin{itemize}
+  \item Understand the organization of the ARM support code
+  \item Understand how the kernel can be ported to a new hardware
+    board
+  \end{itemize}
+}
+{Lecture - Power management}
+{
+  \begin{itemize}
+  \item Overview of the power management features of the kernel
+  \item Topics covered: clocks, suspend and resume, dynamic frequency
+    scaling, saving power during idle, runtime power management,
+    regulators, etc.
+  \end{itemize}
+}
+
+\feagendaonecolumn
+{Lecture - The Linux kernel development process}
+{
+  \begin{itemize}
+  \item Organization of the kernel community
+  \item The release schedule and process: release candidates, stable
+    releases, long-term support, etc.
+  \item Legal aspects, licensing.
+  \item How to submit patches to contribute code to the community.
+  \end{itemize}
+}
+
+\end{document}
+
