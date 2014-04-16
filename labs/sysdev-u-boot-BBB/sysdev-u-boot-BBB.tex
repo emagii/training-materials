@@ -20,12 +20,13 @@ very specific to the hardware platform. There are usually two cases:
 
 \end{itemize}
 
-The Beaglebone Black board, which uses an AM335x Sitara processor, falls into
+The \devboard board, which uses an AM335x Sitara processor, falls into
 the second category. 
 
 The Sitara processors support a multitude of boot sources, and the boot
 source is selected by configuring a set of pins at reset.
-The Beaglebone limits the choices to one of two options.
+The Beaglebone limits the choices to one of two options and you choose
+which one, with a button.
 
 The monitor integrated in the ROM reads the internal
 eMMC flash chip to search for a valid bootloader.
@@ -34,138 +35,45 @@ for a micro-SD card inserted in the connector.
 
 The U-Boot bootloader programmed into the Beaglebone Black boots linux
 by executing the contents of the "bootcmd" environment variable, 
-which normally is set to use the SD-Card contents, so normally
-the button does not have to be pressed.
-
-Therefore, by using an MMC/SD card, we can
-start up a Sitara-based board without having anything installed on it.
+which normally tries to use the SD-Card contents first, and the eMMC memory
+only if booting from SD-Card fails, so normally the button does not have to be pressed.
 
 
-
+\clearpage
 \section{Setup}
 
-Go to the \code{~/felabs/sysdev/bootloader} directory. 
-
-\section{MMC/SD card setup}
-
-The ROM monitor can read files from a FAT filesystem on the MMC/SD
-card. However, the MMC/SD card must be carefully partitionned, and the
-filesystem carefully created in order to be recognized by the ROM
-monitor. Here are special instructions to format an MMC/SD card
-for the Sitara-based platforms.
-
-First, clean out your system log buffer by \code{sudo dmesg -c}, then
-connect your card reader to your workstation, with the MMC/SD
-card inside. Type the \code{dmesg} command to see which device is used
-by your workstation. In case the device is \code{/dev/sdb}, you will see
-something like:
-
-\begin{verbatim}
-sd 3:0:0:0: [sdb] 3842048 512-byte hardware sectors: (1.96 GB/1.83 GiB)
-\end{verbatim}
-
-If your PC has an internal MMC/SD card reader, the device may also been
-seen as \code{/dev/mmcblk0}, and the first partition as
-\code{mmcblk0p1}. \footnote{This is not always the case with internal
-MMC/SD card readers. On some PCs, such devices are behind an internal
-USB bus, and thus are visible in the same way external card readers
-are}. You will see that the MMC/SD card is seen in the same
-way by the IGEPv2 board.
-
-In the following instructions, we will assume that your MMC/SD card
-is seen as \code{/dev/sdb} by your PC workstation.
-
-\fbox{\begin{minipage}{\textwidth}
-{\bfseries
-Caution: read this carefully before proceeding. You could destroy
-existing partitions on your PC!
-
-Do not make the confusion between the device that is used by your
-board to represent your MMC/SD disk (probably \code{/dev/sda}), and the device
-that your workstation uses when the card reader is inserted (probably
-\code{/dev/sdb}).
-
-So, don't use the \code{/dev/sda} device to reflash your MMC disk from
-your workstation. People have already destroyed their Windows
-partition by making this mistake.}
-\end{minipage}}
-
-You can also run \code{cat /proc/partitions} to list all block devices
-in your system. Again, make sure to distinguish the SD/MMC card from the
-hard drive of your development workstation!
-
-Type the \code{mount} command to check your currently mounted
-partitions. If MMC/SD partitions are mounted, unmount them:
-
-\begin{verbatim}
-$ sudo umount /dev/sdb1
-$ sudo umount /dev/sdb2
-...
-\end{verbatim}
-
-Now, clear possible MMC/SD card contents remaining from previous training 
-sessions:
-
-\begin{verbatim}
-$ sudo dd if=/dev/zero of=/dev/sdb bs=1M count=256
-\end{verbatim}
-
-As we explained earlier, the TI Sitara ROM monitor needs special partition geometry settings
-to read partition contents. The MMC/SD card must have 255 heads and 63 sectors.
-
-Let's use the \code{cfdisk} command to create a first partition with these settings:
-
-\code{sudo cfdisk -h 255 -s 63 /dev/sdb}
-
-In the \code{cfdisk} interface, create a first primary partition, starting from the beginning,
-with a 512 MB size, a \code{Bootable} type and a \code{0C} type (\code{W95 FAT32 (LBA)}).
-
-You might as well create a partition for the rootfs while you are at it.
-Create a new primary partition, starting at the beginning, with 2048 MB size and a \code{83} 
-type (\code{Linux})  This code is the default.
-
-Press \code{Write} when you are done.
-
-If you used \code{fdisk} before, you should find \code{cfdisk} much more convenient!
-
-Format the first partition to FAT32, with the \code{boot} label (name):
-
-\begin{verbatim}
-sudo mkfs.vfat -n BOOT -F 32 /dev/sdb1
-\end{verbatim}
-
-Then format the second partition to \code{EXT4}.
-
-\begin{verbatim}
-sudo mkfs -t ext4 -L rootfs /dev/sdb1
-\end{verbatim}
-
-Then, remove and insert your card again.
-
-Your MMC/SD card is ready to use.
+Go to the \labdir directory and the enter the \code{bootloader} subdirectory.
 
 \section{U-Boot setup}
 
-Download U-Boot from the mainline igep download site:
+Download U-Boot from the mainline U-Boot download site:
 
 \begin{verbatim}
 wget ftp://ftp.denx.de/pub/u-boot/u-boot-2013.10.tar.bz2
-tar xvf u-boot-2013.10.tar.bz2
+tar -jxvf u-boot-2013.10.tar.bz2
 cd u-boot-2013.10
 \end{verbatim}
 
 We want to figure out what is going on, so we will init a git repo.
 
+Then we will add all the files and create a commit.
+
 \begin{verbatim}
 git init
 git add .
-git commit -m "Initial Commit"
+git commit -m "Initial Commit" -s
 \end{verbatim}
 
-Then, apply the
-\code{0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch} patch from
-this lab's \code{data} directory:
+The '-m' switch will tell git to use the following string as the commit message,
+and the '-s' switch will sign the commit with your user info as defined above.
 
+The \code{0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch} patch from
+this lab's \code{data} directory should be applied:
+
+The traditional way is to \code{'cat'} the patch and pipe it through the \code{'patch'} utility,
+but we will do it using git instead
+
+Traditional Way:
 {\small
 \begin{verbatim}
 cat /path/to/0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch | \
@@ -173,7 +81,7 @@ cat /path/to/0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch | \
 \end{verbatim}
 }
 
-or
+Patch using git:
 
 {\small
 \begin{verbatim}
@@ -181,32 +89,95 @@ git am /path/to/0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch
 \end{verbatim}
 }
 
+\code{'git am'} will not only apply the patch, it will also commit the patch
+using the original patch message. There are more requirements on a patch
+when you use "git am", since it will only accept well formed patches.
 
-Get an understanding of its configuration and compilation steps by
+If a patch fails, then it will give you different options on how to handle the problem.
+
+
+Patching with ''git am' should succeed, if you did not patch using the traditional way first.
+
+If it fails, you can abort the patch through:
+{\small
+\begin{verbatim}
+git am --abort
+\end{verbatim}
+}
+
+You can check the status of the git tree. Try:
+{\small
+\begin{verbatim}
+git status
+\end{verbatim}
+}
+
+If you see any modified files, you can restore them using the checkout command.
+
+{\small
+\begin{verbatim}
+git checkout <filename>
+\end{verbatim}
+}
+
+This will restore the file to its original state.
+
+Try out:
+{\small
+\begin{verbatim}
+git log
+\end{verbatim}
+}
+
+\clearpage
+\section{U-Boot Source Tree}
+Get an understanding of U-Boot's configuration and compilation steps by
 reading the \code{README} file, and specifically the {\em Building the
   software} section.
 
 Basically, you need to:
 
 \begin{itemize}
-\item set up the cross compiler 
+\item set up the cross compiler (You could source the \code{toolchain.sh} script in the top directory)
+or if you use the Yocto toolchain, source the appropriate \code{environment...} file
 \begin{verbatim}
-export GCCROOT=/usr/local/xtools/arm-unknown-linux-uclibcgnueabi
-export PATH=${GCCROOT}/bin:$PATH
-export CROSS_COMPILE=arm-linux-
+#!/bin/sh
+export	ARCH=arm
+export	GCCROOT=/usr/local/uclibc/arm-unknown-linux-uclibcgnueabihf
+export	PATH=$GCCROOT/bin:$PATH
+export	CROSS_COMPILE=arm-linux-
 \end{verbatim}
 
 \item Configure U-Boot to build for the Beaglebone Black
-\begin{verbatim}
-make am335x_boneblack_config
-\end{verbatim}
 
-  Note that for our platform, the configuration file is
+Note that for our platform, the configuration file is
 \begin{verbatim}
 include/configs/am335x_evm.h
 \end{verbatim}
 Read this file to get an
   idea of how a U-Boot configuration file is written;
+
+Then configure U-Boot.
+
+\begin{verbatim}
+$ make am335x_boneblack_config
+Configuring for am335x_boneblack - Board: am335x_evm, Options: SERIAL1,CONS_INDEX=1,EMMC_BOOT
+\end{verbatim}
+
+If you get a lot of errors, try \code{make clean} or \code{make distclean} and rerun.
+
+
+You should see something similar to:
+\begin{verbatim}
+Configuring for am335x_boneblack - Board: am335x_evm,
+    Options: SERIAL1,CONS_INDEX=1,EMMC_BOOT
+\end{verbatim}
+
+This configuration step generates a \code{Makefile} fragment which you may want to look at.
+
+\begin{verbatim}
+include/autoconf.mk
+\end{verbatim}
 
 \item Finally, run \code{make}\footnote{You can speed up the compiling
   by using the \code{-jX} option with \code{make}, where X is the number of parallel
@@ -215,66 +186,116 @@ Read this file to get an
 
 \end{itemize}
 
+One would think that the build generated a number of new files. Checking with:
+
+{\small
+\begin{verbatim}
+git status
+\end{verbatim}
+}
+
+should print out:
+
+\begin{verbatim}
+# On branch master
+nothing to commit (working directory clean)
+\end{verbatim}
+
+If you do an \code{ls} you {\bf will} see some new files like \code{u-boot.img}.
+
+The reason they are not detected, is that they are hidden by the \code{.gitignore} file 
+filter. If you name a \code{regexp} in \code{.gitignore} it will be ignored.
+
+List the \code{.gitignore} by \code{more .gitignore}.
+
+\section{Rescue binaries}
+
+If you have trouble generating binaries that work properly, or later
+make a mistake that causes you to loose your \code{MLO} and
+\code{u-boot.img} files, you will find working versions under
+\code{data/} in the current lab directory.
+
+\clearpage
+
+\section{Preparing an SD-card with U-Boot}
 You can now copy the generated \code{MLO} and \code{u-boot.img} files
-to the MMC card. \code{MLO} is the first stage bootloader,
+to the SD card FAT partition. \code{MLO} is the first stage bootloader,
 \code{u-boot.img} is the second stage bootloader.
 
-You should also create a file \code{uEnv.txt} with the following contents for use in future labs.
-Note that the IP address range must not be in use in the training lab. If it is, select another
-range like 192.168.1.x.
+You should also create a file \code{uEnv.txt} looking like:
 
 \begin{verbatim}
 ipaddr=192.168.0.100
 serverip=192.168.0.1
+loadaddr=0x80200000
+fdtaddr=0x80F80000
+HOME=/home/ulf
+console=ttyO0,115200n8
+nfsopts=nolock
+netargs=setenv bootargs console=${console} root=/dev/nfs \
+   nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+tftp_kernel=tftp ${loadaddr} zImage
+tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
+bootkernel=bootz ${loadaddr} - ${fdtaddr}
+bootcmd=run tftp_kernel tftp_dtb netargs bootkernel
+mmcboot=echo MMC boot disabled
+nandboot=echo NAND boot disabled
 \end{verbatim}
 
-Copy it to the FAT partition.
+(Caution: in \code{ttyO2} above, it's the capital letter \code{O}, like in
+{\bf O}MAP and not the number zero)
 
+{\bf Note that the 'netargs' line should be a single line.}
+
+You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
+
+You should also use your own {\bf \code{$HOME}}.
+
+Copy \code{uEnv.txt} it to the FAT partition.
 
 Run \code{sudo sync} to make sure it is properly copied
 
-Unmount the MMC card partition.
-
-\section{Setting up serial communication with the board}
-
-Plug the Beaglebone Black board on your computer using the provided
-USB-to-serial cable. When plugged-in, a serial port should appear,
-\code{/dev/ttyUSB0}.
-
-You can also see this device appear by looking at the output of
-\code{dmesg}.
-
-To communicate with the board through the serial port, install a
-serial communication program, such as \code{picocom}:
+Unmount the SD card partition (Choose the disk where the SD-card is mounted).
 
 \begin{verbatim}
-sudo apt-get install picocom
+sudo umount /dev/sd<n>
 \end{verbatim}
 
-You also need to make your user belong to the \code{dialout} group to be
-allowed to write to the serial console:
-
-\begin{verbatim}
-sudo adduser $USER dialout
-\end{verbatim}
-
-You need to log out and in again for the group change to be effective.
-
-Run \code{picocom -b 115200 /dev/ttyUSB0}, to start serial
-communication on \code{/dev/ttyUSB0}, with a baudrate of 115200. If
-you wish to exit \code{picocom}, press \code{[Ctrl][a]} followed by
-\code{[Ctrl][x]}.
+\clearpage
 
 \section{Testing U-Boot on the MMC card}
 
-Insert the MMC card into the Beaglebone Black board, reset the board while pressing
-the "user" button "and check that it boots your new bootloader. You can verify this by checking
-the build date: (Should obviously be todays date)
+Insert the MMC card into the Beaglebone Black board, Unplug the power cord.
+While pressing the user button, reinsert the power cord and check that it boots your new bootloader. 
+You can verify this by checking the build date: (Should obviously be todays date). 
+Press the {\bf RETURN} button, when the prompt says \code{Hit anykey to stop autoboot:}
+
+\begin{center}
+    \includegraphics[height=5cm]{labs/sysdev-u-boot-BBB/beagleboneblack-user-button.png}
+\end{center}
+
+If the SD-Card boot does not work, the processor will try to boot from the internal eMMC memory,
+and the date will be different from todays date.
+
+If that happens, retry removing the power plug, then push the button, reinsert power.
+
+If it still does not work , verify that the SD card is correctly setup using \code{cfdisk} 
+
+\begin{itemize}
+\item heads=255
+\item sectors=63
+\item partition 1 is bootable
+\item partition 1 is FAT formated and contains \code{MLO}, \code{u-boot.img} and \code{uEnv.txt}
+\end{itemize}
+
+
+\clearpage
+
+If it works you will see something similar to:
 
 \begin{verbatim}
 U-Boot SPL 2013.10-gbd39439-dirty (Mar 03 2014 - 18:03:52)
 spl: error reading image args, err - 0
-reading u-boot.img
 reading u-boot.img
 
 
@@ -295,22 +316,34 @@ The message \code{reading u-boot.img} also confirms that U-Boot has
 been loaded from the MMC device. The error message is due to the \code{Falcon mode} which
 will allow booting the kernel directly from \code{MLO} without loading U-Boot. We do not use this mode.
 
-Interrupt the countdown to enter the U-Boot shell:
+When U-Boot initializes, it will execute the contents of the \code{bootcmd} variable as a script.
+
+Before that happens, it will wait for a few seconds (value of \code{bootdelay}) giving
+the user a chance to stop the boot. 
+
+Press the \code{<return>} button before the counter expires, to enter the U-Boot shell.
+
+ (You may have to reset the Beaglebone if you
+did not manage to press the \code{<return>} button in time)
 \begin{verbatim}
 U-Boot #
 \end{verbatim}
 
 In U-Boot, type the \code{help} command, and explore the few commands available.
+
+You can get more help on a specific command. Try \code{help boot}.
+
 \clearpage
+
 \section{U-Boot Environment}
 U-Boot supports an environment, and you can extend the commandset by defining environment variables.
-These can be "used" as scripts through the \code{run} command
+These can be "used" as scripts through the \code{run} command 
 It is possible to define a compile time environment, which can be extended at run time.
 On the Beaglebone Black, the environment can be updated from the file uEnv.txt stored
 together with \code{MLO} and \code{u-boot.img} on the SD-Card.
 
 All environment variables are normally displayed in alphabetical order, when printed.
-To make it easier to understand, they are displayed in an easier format below.
+To make it easier to understand, they are displayed below in an easier format below.
 
 \begin{lstlisting}
 arch=arm
@@ -361,8 +394,9 @@ ver=U-Boot 2013.10-gbd39439-dirty (Mar 03 2014 - 20:04:45)
 
 The most important environment variable is the \code{bootcmd} script which is used to boot linux.
 
-The Beaglebone Black will try to run mmcboot first on the SD-Card, then on the internal eMMC
-and finally it will try nandboot (which does not work, since the board does not have a NAND flash)
+The Beaglebone Black will first determine which Device Tree file to use, based on the \code{$board_name}
+variable, then it will try to run mmcboot first on the SD-Card, then on the internal eMMC.
+finally if both fails, it will try nandboot (which does not work, since the board does not have a NAND flash)
 
 \begin{lstlisting}
 bootcmd=
@@ -393,7 +427,14 @@ findfdt=
 
 \clearpage
 The normal way of booting is using the internal eMMC or the SD-Card, and
-this function is performed by \code{mmcboot}
+this function is performed by \code{mmcboot}. The \code{mmcdev} variable
+is used to determine the bootsource.
+
+The \code{bootpart} is used to determine the location of the kernel and device tree file.
+For the Beaglebone, they normally are located inside the root file system, in the \code{/boot} directory.
+
+The root file system is normally in partition 2 of the SD--card, but we have not created
+a root file system yet, and certainly not loaded a root file system to the SD-Card.
 
 \begin{lstlisting}
 mmcboot=
@@ -427,14 +468,14 @@ loadimage=load mmc ${bootpart} ${loadaddr} ${bootdir}/${bootfile}
 The \code{mmcboot} code will first select the correct MMC device according to \code{mmcdev}.
 The MMC device will be initialized through the \code{mmc rescan} command.
 If the device is found, then the file \code{uEnv.txt} will be loaded and the contents
-will be overlay the current environment, so any environment variable can be 
-changed by redefining it in the uEnv.txt file.
+will overlay the current environment, so any environment variable can be 
+changed by redefining it in the uEnv.txt file. The changes are not persistent between reboots.
 
-If you want to change the boot mechanism, then set the \code{envcmd} variable,
+If you want to change the boot mechanism, then set the \code{uenvcmd} variable,
 because this will be executed, if it exists.
 A typical use was to change the kernel from uImage to zImage.
 
-The environment tries to load the kernel from the root file system
+if \code{uenvcmd} does not boot the kernel, U-Boot tries to load the kernel from the root file system
 in the \code{/boot} directory, so the rootfs must contain the kernel.
 
 Finally, the the kernel will be booted, using a device tree file.
@@ -451,7 +492,9 @@ The Beaglebone Black is using the \code{am335x−-boneblack.dtb} file.
 
 \begin{lstlisting}
 
-mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} rootfstype=${mmcrootfstype}
+mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} \
+
+	 rootfstype=${mmcrootfstype}
 
 loadfdt=load mmc ${bootpart} ${fdtaddr} ${bootdir}/${fdtfile}
 
@@ -476,7 +519,9 @@ NFS Booting can be of interest, and this is supported by the Beaglebone default 
 An easy way to boot from the network, is to set the \code{uenvcmd} variable to \code{run netboot}
 
 \begin{lstlisting}
-netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=dhcp
+netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs \
+
+	nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=dhcp
 
 netboot=
 	echo Booting from network ...;
@@ -529,19 +574,153 @@ spiboot=
 
 
 \clearpage
+\section{Setting up the \devboard Networking in U-Boot}
 
+If you created the \code{uEnv.txt} according to the lab instructions, 
+this will set the \code{serverip} variable. Try:
 
+\begin{verbatim}
+print serverip
+\end{verbatim}
+
+You will get an error message.
+
+\begin{verbatim}
+## Error: "serverip" not defined  
+\end{verbatim}
+
+The reason is that \code{uEnv.txt} is read when the \code{bootcmd} variable is run.
+
+Since you stopped U-Boot by pressing {\bf return}, bootcmd did not run,
+and therefore \code{uEnv.txt} was not read and added to the environment.
+
+Try resetting the board, by giving the command 
+
+\begin{verbatim}
+reset
+\end{verbatim}
+
+Check that the U-Boot date is still correct.
+
+This time, do not press {\bf return} to stop the boot. This time, \code{bootcmd} {\bf is} executed,
+and \code{uEnv.txt} settings are added to the environment.
+We setup the environment to intentionally fail, so you will still get a prompt.
+
+Again:
+
+\begin{verbatim}
+print serverip
+\end{verbatim}
+
+\code{serverip} should now be set to your configuration.
+
+Check the other network parameters.
+\begin{verbatim}
+print ipaddr
+print ethaddr
+\end{verbatim}
+
+If \code{ipaddr} is not set, or not reasonable, set it manually
+
+\begin{verbatim}
+setenv ipaddr 192.168.0.100
+\end{verbatim}
+
+If the MAC address is not set, you also need to set it in U-boot,
+If this is the case, please contact the teacher and you will be allocated
+a number XX. \footnote{The \devboard contains an EEPROM which is programmed with the MAC address
+ at production time, so you should not have this problem}
+
+\begin{verbatim}
+setenv ethaddr 01:02:03:04:05:XX
+\end{verbatim}
+
+If you changed \code{ethaddr}, switch your board off and on again\footnote{Power cycling your
+  board is needed to make your \code{ethaddr} permanent, for obscure
+  reasons. If you don't, U-boot will complain that \code{ethaddr} is not
+  set.}. Don't forget to press the {\bf user} button.
+
+In case the board was previously configured in a different way, we
+also turn off automatic booting after commands that can be used to
+copy a kernel to RAM:
+
+\begin{verbatim}
+setenv autostart no
+\end{verbatim}
+
+\clearpage
+\section{Saving the updated U-Boot environment}
+
+If you had a NAND flash, then you could have saved the environment by
+
+\begin{verbatim}
+saveenv
+\end{verbatim}
+
+Since we are running from an MMC card, you have to retype this every time you reboot,
+or add it to your \code{uEnv.txt}.\footnote{\code{ethaddr} can be set, but not changed,
+once saved unless the environment is erased by using an external programmer}
+
+Note the difference in syntax.
+\begin{lstlisting}
+U-Boot:
+
+	setenv <VAR> <VALUE>
+
+uEnv.txt:
+
+	<VAR>=<VALUE>
+
+\end{lstlisting}
+
+\section{Testing the customized U-Boot environment}
+
+You can then test the TFTP connection. First, put a small text file called
+\code{textfile.txt} in the directory exported through TFTP on your development
+workstation (Normally \code{/tftpboot}). Then, from U-Boot, do:
+
+\begin{verbatim}
+tftp 0x80000000 textfile.txt
+\end{verbatim}
+
+{\bf Caution: known issue in Ubuntu 12.04 and later}:
+if this command doesn't work, you may have to stop the server
+and start it again every time you boot your workstation:
+
+\begin{verbatim}
+sudo service tftpd-hpa restart
+\end{verbatim}
+
+or
+
+\begin{verbatim}
+sudo /etc/init.d/xinetd restart
+\end{verbatim}
+
+depending on which tftpd server you use.
+
+The \code{tftp} command should have downloaded
+the \code{textfile.txt} file from your development
+workstation into the board's memory at location 0x80000000 (this
+location is part of the board DRAM). You can verify that the download
+was successful by dumping the contents of the memory:
+
+\begin{verbatim}
+md 0x80000000
+\end{verbatim}
+
+\clearpage
 \section{Reflashing from U-boot (Skip)}
 
 Since the Beaglebone Black does not have any NAND Flash, the following
-chapter is for reference only.
+chapter is for reference only, and you can just read through it.
 
 We will flash U-boot and later the kernel and filesystem in NAND
 flash. As far as bootloaders are concerned, the layout of the NAND
 flash will look like:
 
 \begin{center}
-  \includegraphics[width=\textwidth]{labs/sysdev-u-boot/flash-map.pdf}
+  \includegraphics[width=\textwidth]{labs/sysdev-u-boot-BBB/flash-map.pdf}
 \end{center}
 
 \begin{itemize}
@@ -622,7 +801,7 @@ board:
 nand erase 260000 80000
 \end{verbatim}
 
-You can remove MMC card, then reset the IGEP board. You should see the
+You can remove MMC card, then reset the board. You should see the
 freshly flashed U-Boot starting.
 
 You should now see the U-Boot prompt:
@@ -633,145 +812,4 @@ U-Boot #
 
 \clearpage
 
-\section{Setting up Ethernet communication}
 
-Later on, we will transfer files from the development workstation to
-the board using the TFTP protocol, which works on top of an Ethernet
-connection.
-
-To start with, install and configure a TFTP server on your development
-workstation, as detailed in the bootloader slides.
-
-With a network cable, connect the Ethernet port of your board to the
-one of your computer. If your computer already has a wired connection
-to the network, your instructor will provide you with a USB Ethernet
-adapter. A new network interface, probably \code{eth1} or \code{eth2},
-should appear on your Linux system.
-
-To configure this network interface on the workstation side, click on
-the {\em Network Manager} tasklet on your desktop, and select {\em
-  Edit Connections}.
-
-\begin{center}
-\includegraphics[width=8cm]{labs/sysdev-u-boot/network-config-1.png}
-\end{center}
-
-Select the new {\em wired network connection}:
-
-\begin{center}
-\includegraphics[width=8cm]{labs/sysdev-u-boot/network-config-2.png}
-\end{center}
-
-In the \code{IPv4 Settings} tab, press the \code{Add} button
-and make the interface use a static IP
-address, like \code{192.168.0.1} (of course, make sure that this
-address belongs to a separate network segment from the one of the main
-company network).
-
-\begin{center}
-\includegraphics[width=8cm]{labs/sysdev-u-boot/network-config-3.png}
-\end{center}
-
-You can use \code{255.255.255.0} as \code{Netmask}, and leave the
-\code{Gateway} field untouched (if you click on the \code{Gateway} box, you
-will have to type a valid IP address, otherwise you won't be apply to
-click on the \code{Apply} button).
-
-The board must also be configured, but if you followed the instructions,
-the uEnv.txt file should have set the  network parameters.
-
-Check by
-
-\begin{verbatim}
-print ipaddr
-print serverip
-print ethaddr
-\end{verbatim}
-
-If they are not set, or not reasonable, configure the network on the board in U-Boot by setting the \code{ipaddr}
-and \code{serverip} environment variables:
-
-\begin{verbatim}
-setenv ipaddr 192.168.0.100
-setenv serverip 192.168.0.1
-\end{verbatim}
-
-If the MAC address is not set, you also need to set it in U-boot,
-If this is the case, please contact the teacher and you will be allocated
-a number XX.
-
-\begin{verbatim}
-setenv ethaddr 01:02:03:04:05:XX
-\end{verbatim}
-
-In case the board was previously configured in a different way, we
-also turn off automatic booting after commands that can be used to
-copy a kernel to RAM:
-
-\begin{verbatim}
-setenv autostart no
-\end{verbatim}
-
-If you had a NAND flash, then you could have saved the environment by
-
-\begin{verbatim}
-saveenv
-\end{verbatim}
-
-Since we are running from an MMC card, you have to retype this every time you reboot,
-or add it to your \code{uEnv.txt}.
-
-Note the difference in syntax.
-\begin{lstlisting}
-U-Boot:
-
-	setenv <VAR> <VALUE>
-
-uEnv.txt:
-
-	<VAR>=<VALUE>
-
-\end{lstlisting}
-
-
-
-Now switch your board off and on again\footnote{Power cycling your
-  board is needed to make your \code{ethaddr} permanent, for obscure
-  reasons. If you don't, U-boot will complain that \code{ethaddr} is not
-  set.}.
-
-You can then test the TFTP connection. First, put a small text file in
-the directory exported through TFTP on your development
-workstation. Then, from U-Boot, do:
-
-\begin{verbatim}
-tftp 0x80000000 textfile.txt
-\end{verbatim}
-
-{\bf Caution: known issue in Ubuntu 12.04 and later}:
-if this command doesn't work, you may have to stop the server
-and start it again every time you boot your workstation:
-
-\begin{verbatim}
-sudo service tftpd-hpa restart
-\end{verbatim}
-
-The \code{tftp} command should have downloaded
-the \code{textfile.txt} file from your development
-workstation into the board's memory at location 0x80000000 (this
-location is part of the board DRAM). You can verify that the download
-was successful by dumping the contents of the memory:
-
-\begin{verbatim}
-md 0x80000000
-\end{verbatim}
-
-We will see in the next labs how to use U-Boot to download, flash and
-boot a kernel.
-
-\section{Rescue binaries}
-
-If you have trouble generating binaries that work properly, or later
-make a mistake that causes you to loose your \code{MLO} and
-\code{u-boot.img} files, you will find working versions under
-\code{data/} in the current lab directory.
