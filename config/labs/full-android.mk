@@ -21,7 +21,7 @@ endif
 
 LAB_HELPER+=full-android-labs-help
 
-full-android-labs.pdf:	SESSION_URL="${VENDOR_URL}/doc/training/android"
+full-android-labs.pdf:	SESSION_URL="${VENDOR_URL}doc/training/android"
 
 full-android-labs-help:
 	$(HELP) "full-android-labs.pdf"			"Complete labs for the 'android' course"
