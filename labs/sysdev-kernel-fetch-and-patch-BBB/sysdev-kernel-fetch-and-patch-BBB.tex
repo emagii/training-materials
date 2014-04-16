@@ -1,0 +1,90 @@
+\subchapter{Kernel sources}{Objective: Learn how to get the kernel
+  sources and patch them.}
+
+After this lab, you will be able to:
+\begin{itemize}
+\item Get the kernel sources from the official location
+\item Apply kernel patches
+\end{itemize}
+
+\section{Setup}
+
+Goto the \labdir and from there to the \code{kernel} subdirectory.
+
+\section{Get the sources}
+
+Go to the Linux kernel web site (\url{http://www.kernel.org/}) and
+identify the latest stable version.
+
+Just to make sure you know how to do it, check the version of the
+Linux kernel running on your machine.
+
+We will use \code{linux-3.13.x}, which this lab was tested with.
+
+To practice the patch command later, download the full 3.13
+sources. Unpack the archive, which creates a \code{linux-3.13}
+directory. Remember that you can use \code{wget <URL>} on the command
+line to download files.
+
+Enter the kernel source directory and create a git repo through
+
+\begin{verbatim}
+git init
+git add .
+git commit -m "Initial Commit" -s
+\end{verbatim}
+\clearpage
+\section{Apply patches}
+
+Download the patch file corresponding to the latest 3.13.7 release:
+Put the patch file in the parent directory of the kernel source.
+This will be used to update the kernel from 3.13 to 3.13.7.
+
+Patches are applied using the \code{patch} program which normally reads from \code{stdin},
+but you can supply a filename using the \code{-i} switch.
+
+Normally you have to supply a \code{-p<num>} switch. The patches contains filenames
+which are relative to a top directory. The \code{-p<num>} switch will shave off
+part of the directory structure of a patch filename. I.E:
+ 
+If \code{-p1} is supplied, \code{/a/lib/mylib.c}  becomes \code{/lib/mylib.c}
+
+If \code{-p2} is supplied, \code{/a/lib/mylib.c}  becomes \code{mylib.c} 
+
+Normally kernel patches requires \code{-p1} so a way to apply patches would be:
+
+\begin{verbatim}
+patch -p1 -i path/to/patch-x.y.z
+\end{verbatim}
+
+Another way would be
+
+\begin{verbatim}
+cat path/to/patch-x.y.z | patch -p1
+\end{verbatim}
+
+The downloaded patch is compressed. There is a way to apply a patch
+without uncompressing it first into a temporary file.
+Can you figure out how?
+
+Without uncompressing it first (!), apply the patch to the Linux source directory.
+
+Use \code{git} to first add all files, and then commit the patch with a reasonable comment.
+
+Check your repo with \code{git status} and \code{git log}. Does it look reasonable?
+
+You can regenerate a patch from the repo. Try:
+
+\begin{verbatim}
+git format-patch -1
+\end{verbatim}
+
+This will create a file \code{0001-<patch-name>.patch}
+
+View the patch file with \code{vi} or \code{gvim} or any other editor,
+to understand the information carried by such a file. 
+How are added or removed files described?
+
+Remove the patch file after inspection.
+
+Rename the \code{linux-3.13} directory to \code{linux-3.13.7}.
