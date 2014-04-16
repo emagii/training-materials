@@ -30,6 +30,6 @@ LAB_HELPER+=emagii-full-kernel-labs-help
 full-kernel-labs.pdf:	SESSION_URL="http://www.emagii.com/doc/training/embedded-linux"
 
 emagii-full-kernel-labs-help:
-	$(HELP) "emagii-full-kernel-labs.pdf"		"Complete labs for the 'eMagii kernel' course"
+	$(HELP) "full-kernel-labs.pdf"		"Complete labs for the 'eMagii kernel' course"
 
 endif
