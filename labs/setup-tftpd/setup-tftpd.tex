@@ -1,0 +1,81 @@
+\subchapter{Setting up a TFTP Server}{Objectives:
+Set up TFTP communication with the development workstation.}
+
+\section{Install the TFTPD server}
+
+Later on, we will transfer files from the development workstation to
+the board using the TFTP protocol, which works on top of an Ethernet
+connection.
+
+Normally, if you did \code{make prepare} before, you should have
+the TFTP server running on your system. Otherwise do:
+
+\begin{verbatim}
+sudo apt-get install tftpd tftp xinetd
+\end{verbatim}
+
+\section{Configuring the TFTPD server}
+
+The configuration file for \code{tftpd} is \code{/etc/xinetd.d/tftp}
+
+An example \code{tftp} file is in \labdir /network
+\begin{verbatim}
+service tftp
+{
+        protocol        = udp
+        port            = 69
+        socket_type     = dgram
+        wait            = yes
+        user            = nobody
+        server          = /usr/sbin/in.tftpd
+        server_args     = /tftpboot
+        disable         = no
+}
+\end{verbatim}
+
+Create the configuration file.
+
+The default TFTP directory is \code{/tftpboot}
+
+if it doesnt exist, create it and make it owned by 'nobody'
+and make sure that  \code{tftpboot} is easily accessible
+
+
+\begin{verbatim}
+sudo    mkdir -p        /tftpboot
+sudo    chown -R nobody /tftpboot
+sudo    chmod -R 777    /tftpboot
+\end{verbatim}
+
+Restart tftpd by:
+
+\begin{verbatim}
+sudo /etc/init.d/xinetd restart
+\end{verbatim}
+
+\clearpage
+\section{Testing the TFTPD server}
+
+Create a file in \code{tftpboot}:
+
+\begin{verbatim}
+cd	/tftpboot
+echo	111	> testfile.txt
+\end{verbatim}
+
+Start tftp and get the file
+
+\begin{verbatim}
+cd
+tftp	localhost
+
+tftp> get testfile.txt
+Sent 5 bytes in 0.0 seconds
+
+tftp> quit
+
+cat testfile.txt
+
+\end{verbatim}
+
+
