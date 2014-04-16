@@ -1,0 +1,75 @@
+\subchapter{Setting up the TFTPD-HPA server}{Objectives:
+Set up TFTP communication with the development workstation.}
+
+\section{Install the TFTPD-HPA server}
+
+Later on, we will transfer files from the development workstation to
+the board using the TFTP protocol, which works on top of an Ethernet
+connection.\footnote{the tftpd-hpa server is more modern than the
+tdtpd server, but it has problems on Ubuntu 12.04, 
+so it is not recommended to use it if your workstation has this installation}
+
+To start with, install and configure a TFTP server on your development
+workstation, as detailed in the bootloader slides.
+
+Normally, if you did \code{make prepare} before, you should have
+the TFTP server running on your system. Otherwise do:
+
+\begin{verbatim}
+sudo apt-get install tftpd-hpa tftp-hpa
+\end{verbatim}
+
+\section{Configuring the TFTPD-HPA server}
+
+The configuration file for \code{tftpd} is \code{/etc/init/tftpd-hpa.conf}
+which uses \code{/etc/default/tftpd-hpa}.
+
+The default TFTP directory is \code{/var/lib/tftpboot}
+
+You may want to change this to:
+
+\begin{verbatim}
+TFTP_DIRECTORY="/tftpboot"
+\end{verbatim}
+
+and make sure that  \code{tftpboot"} is easily accessible
+
+\begin{verbatim}
+sudo    mkdir -p        /tftpboot
+sudo    chown -R nobody /tftpboot
+sudo    chmod -R 777    /tftpboot
+\end{verbatim}
+
+Restart tftpd by:
+
+\begin{verbatim}
+service tftpd-hpa restart
+service tftpd-hpa status
+\end{verbatim}
+
+\clearpage
+\section{Testing the TFTPD-HPA server}
+
+Create a file in \code{tftpboot}:
+
+\begin{verbatim}
+cd	/tftpboot
+echo	111	> testfile.txt
+\end{verbatim}
+
+Start tftp and get the file
+
+\begin{verbatim}
+cd
+tftp	localhost
+
+tftp> get testfile.txt
+Sent 5 bytes in 0.0 seconds
+
+tftp> quit
+
+cat testfile.txt
+
+\end{verbatim}
+
+
