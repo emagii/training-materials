@@ -1,0 +1,198 @@
+\subchapter{Extra Lab: Building a cross-compiling toolchain using Yocto}
+  {Objective: Learn how build a well tested cross-compiling toolchain using the eglibc C
+  library}
+
+\section{This is an optional exercise for home}
+
+After this lab, you will be able to:
+
+\begin{itemize}
+\item Generate a modern toolchain for the Beaglebone.
+\end{itemize}
+
+\section{Setup}
+
+Go to the \labdir directory.
+
+\section{Install needed packages}
+
+Install the packages needed for this lab:
+
+\begin{verbatim}
+make prepare
+\end{verbatim}
+
+\section{Getting Angstrom}
+
+Angstrom is a Yocto compliant distribution supporting the Beaglebone
+
+\begin{verbatim}
+git clone https://github.com/Angstrom-distribution/setup-scripts.git	Angstrom-1.4
+\end{verbatim}
+
+Then checkout the Angstrom-1.4 branch.
+The "master" branch is based on Angstrom-1.3 and has some known bugs in the kernel.
+The Angstrom-1.4 is currently (Feb 2014) the best branch.
+The Anstrom-1.5 branch is still in development.
+
+\begin{verbatim}
+cd	Angstrom-1.4
+git checkout -b v2013.06 origin/angstrom-v2013.06-yocto1.4
+\end{verbatim}
+
+\section{Configuring Angstrom}
+
+Check the \code{sources} directory. It contains the \code{layers.txt} file which is a
+list of \code{meta-layers} which will be used to build everything.
+
+Also check the \code{conf} directory. Which files are present.
+
+Once you have Angstrom installed, you should configure it for your board.
+
+\begin{verbatim}
+./oebb.sh config beaglebone
+\end{verbatim}
+
+This will setup the encironement file \code{environment-angstrom-v2013.06}
+and will also add some files to the \code{conf} directory.
+
+Check the \code{sources} directory again. Now all the layers described in \code{layers.txt}
+are downloaded.
+
+If you have access with a DVD/USB memory with the tarballs, then you may
+want to copy those to the \code{sources/downloads} directory to speed up the build.
+
+You also want now want to checkout the \code{conf} directory again.
+
+Some files have been added, which?
+
+Have a look at the files. 
+
+\begin{itemize}
+\item \code{auto.conf} contains the machine description.
+
+\item \code{bblayers.conf} is used to generate the BBLAYERS variable
+   which descripes the search path for recipes.
+
+\item \code{local.conf} Main configuration file
+
+\item \code{sanity_info} Used for check duiring the build
+
+\item \code{site.conf} describes the location for \code{build} directories
+
+\end{itemize}
+
+You should edit the \code{local.conf} to optimize for your own machine.
+
+Make sure that you generate a tar.xz file
+\begin{verbatim}
+./oebb.sh config beaglebone
+# What kind of images do we want?
+IMAGE_FSTYPES_append = " tar.xz"
+\end{verbatim}
+
+Also try to optimize parallellity for your own machine.
+If you have a Quad Core/Hyperthreaded core, then the default, 
+the below values are probably OK, but depeding on disk speed,
+RAM size and other things, the optimal value therefore is depending
+on your build machine.
+
+\code{PARALLEL_MAKE} describes how many \code{make} jobs should be used
+to build an application. 
+
+\code{BB_NUMBER_THREADS} describes how many threads should be used to
+build applications. 
+
+This means that the maximum number of tasks are \code{PARALLEL_MAKE * BB_NUMBER_THREADS} 
+
+The goal is to use the CPUs to their maximum, but you also want
+to avoid the OS continously switching tasks. You may have to test a couple
+of configurations, or just use the guidelines below.
+
+\begin{verbatim}
+# Make use of SMP:
+#   PARALLEL_MAKE specifies how many concurrent compiler threads are spawned per bitbake process
+#   BB_NUMBER_THREADS specifies how many concurrent bitbake tasks will be run
+PARALLEL_MAKE     = "-j6"
+BB_NUMBER_THREADS = "12"
+\end{verbatim}
+
+
+\section{Building the Cross-Compiler}
+
+A side functionality of Angstrom/Yocto is the ability to generate
+a Software Development Kit (SDK) for an image.
+
+The SDK contains a cross-compiler and all the header files for the applications
+and libraries included in the image. By generating an SDK, you have a crosscompiler
+with everything needed to build further applications outside the Yocto build system.
+
+\begin{verbatim}
+./environment-angstrom-v2013.06
+bitbake -c populate_sdk console-image
+\end{verbatim}
+
+\code{bitbake} will run for 3-5 hours, on a Core-i7 Quad-Core laptop
+Expect up to 5-7 hours on a Core 2 Duo.
+
+The end result will be a script file in 
+\code{~/felabs/sysdev/Angstrom-1.4/build/tmp-angstrom_v2013_06-eglibc/deploy/sdk}
+
+It is called \code{angstrom-eglibc-x86_64-armv7ahf-vfp-neon-v2013.06-toolchain.sh}
+Make sure it is executable.
+
+\subchapter{Installing a cross-compiling toolchain built by Yocto/Angstrom}
+  {Objective: Install a well tested cross-compiling toolchain using the eglibc C
+  library}
+
+\section{Getting the Yocto SDK}
+
+If you have done the Extra Lab: \code{Building a cross-compiling toolchain using Yocto}, 
+you should have the file
+
+\code{angstrom-eglibc-x86_64-armv7ahf-vfp-neon-v2013.06-toolchain.sh}
+
+If not you will get it from your teacher.
+
+Make sure this script is executable.
+
+\section{Installing the Cross-Compiler}
+
+Typically the compiler will be installed in \code{/usr/local/oecore-x86_64}
+
+You normally do not have write access to \code{/usr/local} so you should
+create the install directory before you install the cross-compiler.
+
+Dustin installation, You will be asked where to install the cross-compiler, so an alternative 
+is to change the installation directory to somewhere where you do have write access.
+
+\begin{verbatim}
+sudo mkdir -p /usr/local/oecore-x86_64
+chown <you> /usr/local/oecore-x86_64
+\end{verbatim}
+
+Run the installation script.
+
+Edit the \code{environment-setup-armv7ahf-vfp-neon-angstrom-linux-gnueabi} file, 
+in the installation directory adding:
+
+\begin{verbatim}
+export CROSS_COMPILE="arm-angstrom-linux-gnueabi-"
+\end{verbatim}
+
+
+From the install directory, copy the 
+\code{environment-setup-armv7ahf-vfp-neon-angstrom-linux-gnueabi} to
+\code{toolchain.sh} in the \labdir directory, and make sure it is executable.
+
+If you are running any of the extra labs for creating a toolchain
+they may overwrite this file, so beware that you are not running
+the wrong cross-compiler. You could name it something else like
+\code{yocto-toolchain.sh}
+
+Now you can use the cross compiler by just sourcing this file.
+
+\begin{verbatim}
+source toolchain.sh
+\end{verbatim}
+
