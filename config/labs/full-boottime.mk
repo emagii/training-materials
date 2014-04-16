@@ -18,7 +18,7 @@ endif
 
 LAB_HELPER+=full-boottime-labs-help
 
-full-boottime-labs.pdf:	SESSION_URL="${VENDOR_URL}/doc/training/boottime"
+full-boottime-labs.pdf:	SESSION_URL="${VENDOR_URL}doc/training/boottime"
 
 full-boottime-labs-help:
 	$(HELP) "full-boottime-labs.pdf"		"Complete labs for the 'boottime' course"
