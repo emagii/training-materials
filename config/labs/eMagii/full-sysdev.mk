@@ -1,7 +1,20 @@
-SYSDEV_LABS   = setup \
+SYSDEV_LABS   = setup-git \
+		setup-emagii \
+		setup-serial \
+		sysdev-SD-card \
+		setup-tftpd \
+		setup-tftpd-hpa \
+		setup-usbnet-startech \
+		setup-network \
+		setup-dhcpd \
+		setup-nfs \
+		setup-yocto-toolchain-1.5 \
+		setup-yocto-toolchain-1.6 \
+		setup-codesourcery \
+		sysdev-toolchain-made-easy-BBB \
 		sysdev-toolchain-BBB \
 		sysdev-u-boot-BBB \
-		sysdev-kernel-fetch-and-patch \
+		sysdev-kernel-fetch-and-patch-BBB \
 		sysdev-kernel-cross-compiling-BBB \
 		sysdev-tinysystem-BBB \
 		sysdev-block-filesystems \
@@ -13,6 +26,7 @@ SYSDEV_LABS   = setup \
 		sysdev-real-time \
 		backup
 
+
 ifdef LABS
 ifeq ($(LABS),full-sysdev)
 LABS_VARSFILE      = ${VENDOR}/labs/sysdev-labs-vars.tex
@@ -23,7 +37,7 @@ endif
 
 LAB_HELPER+=full-sysdev-labs-help
 
-full-sysdev-labs.pdf:	SESSION_URL="${VENDOR_URL}/doc/training/sysdev"
+full-sysdev-labs.pdf:	SESSION_URL="${VENDOR_URL}doc/training/sysdev"
 
 full-sysdev-labs-help:
 	$(HELP) "full-sysdev-labs.pdf"			"Complete labs for the 'sysdev' course"
