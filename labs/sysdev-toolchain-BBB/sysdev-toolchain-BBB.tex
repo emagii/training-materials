@@ -1,6 +1,8 @@
-\subchapter{Building a cross-compiling toolchain}{Objective: Learn how
-  to compile your own cross-compiling toolchain for the uClibc C
+\subchapter{Extra Lab: Building a cross-compiling toolchain using Crosstool-NG}
+  {Objective: Learn how to configure and compile your own cross-compiling toolchain for the uClibc C
   library}
+
+\section{Introduction}
 
 After this lab, you will be able to:
 
@@ -8,6 +10,9 @@ After this lab, you will be able to:
 \item Configure the {\em crosstool-ng} tool
 \item Execute {\em crosstool-ng} and build up your own cross-compiling toolchain
 \end{itemize}
+
+\footnote{The current generation of Crosstool-NG has problems with the ARMv7 architecture, 
+which makes it hard to use with the Beaglebone for Linux}
 
 \section{Setup}
 
@@ -58,11 +63,18 @@ Crosstool-ng comes with a set of ready-made configuration files for
 various typical setups: Crosstool-ng calls them {\em samples}. They can be
 listed by using \code{./ct-ng list-samples}.
 
+Unfortunately, there is not a good configuration for the Beaglebone available in Crosstool-NG.
+
 We will use the arm-unknown-linux-uclibcgnueabi sample. It can be loaded by issuing:
 
 \begin{verbatim}
 ./ct-ng arm-unknown-linux-uclibcgnueabi
 \end{verbatim}
+
+This generates the \code{.config} file in the source directory, but we will replace it with
+something useful.
+
+Copy the \code{uclibc-cortex-a8.config} and the \code{uClibc-0.9.33.config} files from the toolchain made easy lab, to the crosstool-NG top directory, and then copy \code{uclibc-cortex-a8.config} to the \code{.config} file.
 
 Then, to refine the configuration, let's run the \code{menuconfig} interface:
 
@@ -90,13 +102,14 @@ In \code{Toolchain options}:
 
 In \code{Binary utilities}:
 \begin{itemize}
-\item Set \code{binutils version} to \code{2.22}.
+\item Set \code{binutils version} to \code{2.23.1}.
 \end{itemize}
 
 In \code{Debug facilities}:
 \begin{itemize}
-\item Enable \code{gdb}, \code{strace} and \code{ltrace}.
-\item Remove the other options (\code{dmalloc} and \code{duma}).
+\item Enable \code{gdb}, \code{strace}.
+\item Remove the other options (\code{ltrace}, \code{dmalloc} and \code{duma}).
+ Note that building \code{ltrace} will fail.
 \item In \code{gdb} options:
   \begin{itemize}
   \item Make sure that the \code{Cross-gdb} and \code{Build a static gdbserver}
@@ -162,7 +175,7 @@ One solution is to add the \code{-fpermissive} flag to the
 \section{Testing the toolchain}
 
 You can now test your toolchain by adding
-\code{/usr/local/xtools/arm-unknown-linux-uclibcgnueabi/bin/} to your
+\code{/usr/local/xtools/arm-unknown-linux-uclibcgnueabihf/bin/} to your
 \code{PATH} environment variable and compiling the simple
 \code{hello.c} program in your main lab directory with
 \code{arm-linux-gcc}.
