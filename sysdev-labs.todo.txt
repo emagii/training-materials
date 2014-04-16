@@ -1,0 +1,17 @@
+
+http://www.emagii.com/doc/training/embedded-linux/						-- Empty
+
+More details about our training sessions can be found on http://www.emagii.com/training		-- Empty
+
+http://www.emagii.com//doc/training/sysdev/labs.tar.xz	Needed
+
+Page 3
+	labs	felabs
+
+	\labdir
+
+
+git clone https://github.com/emagii/crosstool-ng-armv7a.git
+make prepare
+
+make 
