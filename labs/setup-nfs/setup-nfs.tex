@@ -1,0 +1,56 @@
+\subchapter{Setting up the NFS server}{Objective: Prepare the host for NFS booting}
+
+\section{Install the NFS Server}
+
+\code{make prepare} should have installed the NFS server.
+If you do not have an NFS server installed, install it by
+
+\begin{verbatim}
+sudo apt-get install nfs-kernel-server
+\end{verbatim}
+
+\section{Create the root file system directory}
+
+Create a \code{rootfs} directory in your \$HOME directory. This
+directory will later be used to store the contents of our new
+root filesystem.
+
+\begin{verbatim}
+mkdir -p	$(HOME)/rootfs
+chmod 777	$(HOME)/rootfs
+\end{verbatim}
+
+\section{Configure the NFS server}
+
+The NFS configuration file (\code{/etc/exports}) needs to be modified.
+Edit the file as \code{root} and add the following line: (Replace \code{/home/ulf} with your own home directory)
+
+\begin{verbatim}
+/home/ulf/rootfs *(rw,sync,no_root_squash,no_subtree_check)
+\end{verbatim}
+
+The format for the line is 
+\begin{verbatim}
+<directory> <ip-adress>(<options>)
+\end{verbatim}
+
+The IP address '*' means that the NFS server will allow any computer to connect.
+You can replace it with the IP address of the \devboard.
+
+Make sure that the path and the options are on the same line.
+Also make sure that there is no space between the IP address and the NFS
+options, otherwise default options will be used for this IP address,
+causing your root filesystem to be read-only.
+
+Then, restart the NFS server:
+
+\begin{verbatim}
+sudo service nfs-kernel-server restart
+\end{verbatim}
+
+alternatively:
+
+\begin{verbatim}
+sudo exportfs -av
+\end{verbatim}
+
