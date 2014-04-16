@@ -1,0 +1,120 @@
+\subchapter{SD-card setup}{Objectives: Set up an SD-card for use in later labs}
+
+\section{MMC/SD card setup}
+
+The Beaglebone can boot using files from a FAT filesystem on the MMC/SD
+card. However, the MMC/SD card must be carefully partitioned, and the
+filesystem carefully created in order to be recognized by the ROM
+monitor. Here are special instructions to format an MMC/SD card
+for the Sitara-based platforms.
+
+First, clean out your system log buffer by \code{sudo dmesg -c}.
+
+Then list all disk devices by \code{ls /dev/sd*}.
+
+Connect your card reader to your workstation, with the MMC/SD
+card inside and again list all the disk devices by \code{ls /dev/sd*}.
+
+If you see a new disk device appearing, that will be the new SD-card.
+If you see several new devices like \code{ls /dev/sde /dev/sde1 /dev/sde2},
+this is because the SD-card has several partitions.
+
+If your PC has an internal MMC/SD card reader, the device may also been
+seen as \code{/dev/mmcblk0}, and the first partition as
+\code{mmcblk0p1}. \footnote{This is not always the case with internal
+MMC/SD card readers. On some PCs, such devices are behind an internal
+USB bus, and thus are visible in the same way external card readers
+are}. You will see that the MMC/SD card is seen in the same
+way by the Beaglebone Black board.
+
+If you still fail to detect the disk, then type the \code{dmesg} command 
+to see which device is used by your workstation. 
+In case the device is \code{/dev/sde}, you will see something like:
+
+\begin{verbatim}
+sd 3:0:0:0: [sde] 3842048 512-byte hardware sectors: (1.96 GB/1.83 GiB)
+\end{verbatim}
+
+
+In the following instructions, we will assume that your MMC/SD card
+is seen as \code{/dev/sde} by your PC workstation.
+
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: read this carefully before proceeding. You could destroy
+existing partitions on your PC!
+
+Do not make the confusion between the device that is used by your
+board to represent your MMC/SD disk (probably \code{/dev/sda}), and the device
+that your workstation uses when the card reader is inserted (probably
+\code{/dev/sde}).
+
+So, don't use the \code{/dev/sda} device to reflash your MMC disk from
+your workstation. People have already destroyed their Windows
+partition by making this mistake.}
+\end{minipage}}
+
+You can also run \code{cat /proc/partitions} to list all block devices
+in your system. Again, make sure to distinguish the SD/MMC card from the
+hard drive of your development workstation!
+
+\clearpage
+Type the \code{mount} command to check your currently mounted
+partitions. If MMC/SD partitions are mounted, unmount them:
+
+\begin{verbatim}
+$ sudo umount /dev/sde1
+$ sudo umount /dev/sde2
+...
+\end{verbatim}
+
+Now, clear possible MMC/SD card contents remaining from previous training 
+sessions:
+
+\begin{verbatim}
+$ sudo dd if=/dev/zero of=/dev/sde bs=1M count=256
+\end{verbatim}
+
+As we explained earlier, the TI Sitara ROM monitor needs special partition geometry settings
+to read partition contents. The MMC/SD card must have 255 heads and 63 sectors.
+
+Let's use the \code{cfdisk} command to create a first partition with these settings:
+
+\code{sudo cfdisk -h 255 -s 63 /dev/sde}
+
+In the \code{cfdisk} interface create three primary partitions, starting from the beginning:
+
+\begin{itemize}
+\item BOOT: 512 MB size, a \code{Bootable} type and a \code{0C} type (\code{W95 FAT32 (LBA)})
+\item ROOTFS:  2048 MB size and a \code{83} type (\code{Linux})
+\item DATA: 512 MB size and
+a \code{83} type (\code{Linux})
+\end{itemize}
+
+Press \code{Write} when you are done.
+
+If you used \code{fdisk} before, you should find \code{cfdisk} much more convenient!
+
+Format the first partition to FAT32, with the \code{boot} label (name):
+
+\begin{verbatim}
+sudo mkfs.vfat -n BOOT -F 32 /dev/sde1
+\end{verbatim}
+
+Then format the second partition to \code{EXT4}.
+
+\begin{verbatim}
+sudo mkfs -t ext4 -L rootfs /dev/sde2
+\end{verbatim}
+
+Format the third and last partition to \code{EXT4}.
+
+\begin{verbatim}
+sudo mkfs -t ext4 -L data /dev/sde3
+\end{verbatim}
+
+Then, remove and insert your card again.
+
+Your MMC/SD card is ready for use.
+
+
