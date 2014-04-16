@@ -1,0 +1,223 @@
+\subchapter{Extra Lab: Building a cross-compiling toolchain using Yocto}
+  {Objective: Learn how build a well tested cross-compiling toolchain using the eglibc C
+  library}
+
+\section{This is an optional exercise for home}
+
+After this lab, you will be able to:
+
+\begin{itemize}
+\item Generate a modern toolchain for the Beaglebone.
+\end{itemize}
+
+\section{Setup}
+
+Go to the \labdir directory.
+
+\section{Install needed packages}
+
+Install the packages needed for this lab, if you havent done this before:
+
+\begin{verbatim}
+make prepare
+\end{verbatim}
+
+\section{Getting Yocto}
+
+\begin{verbatim}
+git clone git://git.yoctoproject.org/poky
+\end{verbatim}
+
+Then checkout the dora branch (Yocto-1.5.1).
+
+\begin{verbatim}
+cd poky
+git checkout -b dora origin/dora
+\end{verbatim}
+
+\clearpage
+\section{Configuring Yocto}
+
+Once you have Yocto installed, you should configure it for your board.
+
+\begin{verbatim}
+. oe-init-build-env
+\end{verbatim}
+
+This will create the build directory
+
+Check the \code{build/conf} configuration directory.
+
+An important file is \code{local.conf}
+
+\section{Configuring Yocto in local.conf}
+
+You should edit the \code{local.conf} to optimize for your own machine.
+
+Edit the MACHINE variable to set it to the "beagleboard".
+\footnote{Yocto 1.5.1 does not support building a filesystem for the \devboard, as is,
+but there will be more boards available in Yocto-1.6. If your board is available, you can use
+that as the MACHINE.  \devboard support can be added using extra layers.}
+
+This will ensure that the cross compiler will build an ARMv7 toolchain with \code{NEON} support.
+
+\begin{verbatim}
+# There are also the following hardware board target machines included for 
+# demonstration purposes:
+#
+MACHINE ?= "beagleboard"
+\end{verbatim}
+
+Try to optimize parallellity for your own host machine by editing \code{PARALLEL_MAKE}
+and \code{BB_NUMBER_THREADS}.
+
+\code{PARALLEL_MAKE} describes how many \code{make} jobs should be used
+to build an application. 
+
+\code{BB_NUMBER_THREADS} describes how many threads should be used to
+build applications. 
+
+The default provided in \code{local.conf} is for a Core 2 Duo host machine.
+
+If you have a Quad Core/Hyperthreaded core, then the default is to conservative,
+and the build will be unneccessary slow.
+The below values are probably OK, but are depending on disk speed,
+RAM size and other things.
+
+This means that the maximum number of tasks are \code{PARALLEL_MAKE * BB_NUMBER_THREADS} 
+
+The goal is to use the CPUs to their maximum, but you also want
+to avoid the OS continously switching tasks. You may have to test a couple
+of configurations, or just use the guidelines below.
+
+There is a CPU Frequency Utility which you can install in the system tray,
+which shows the current CPU frequencies.
+If the CPUs are not running at less than full frequencies, you can increase
+the two variables.
+
+Since the loading varies over time, there will still be periods during
+the build where some of the CPUs are idle.  This happens at the end of 
+building the host tools, and at the end of the build, where there are only
+a few applications left to build.
+\clearpage
+\begin{verbatim}
+# Make use of SMP:
+#   PARALLEL_MAKE specifies how many concurrent compiler threads 
+#	are spawned per bitbake process
+#   BB_NUMBER_THREADS specifies how many concurrent bitbake tasks will be run
+PARALLEL_MAKE     = "-j4"
+BB_NUMBER_THREADS = "4"
+\end{verbatim}
+
+The default is to build a toolchain without libraries for static linking.
+
+We will use static linking, so we need to add support by:
+
+\begin{verbatim}
+# Add libraries for static linking
+#
+IMAGE_INSTALL_append = " eglibc-staticdev"
+SDKIMAGE_FEATURES += "staticdev-pkgs dev-pkgs"
+\end{verbatim}
+
+A good place is right after the definition of \code{EXTRA_IMAGE_FEATURES}.
+
+If you use a common download directory, you might want to  change the DL\_DIR variable.
+
+\begin{verbatim}
+# The default is a downloads directory under TOPDIR which is the build directory.
+#
+#DL_DIR ?= "${TOPDIR}/downloads"
+\end{verbatim}
+
+If you have access with a DVD/USB memory with the tarballs, then you may
+want to copy those to the \code{sources/downloads} directory to speed up the build.
+
+\section{Building the Cross-Compiler}
+
+Yocto has the ability to generate a Software Development Kit (SDK) for an image.
+
+By generating an SDK, you get a cross-compiler with everything needed to build 
+further applications outside the Yocto build system.
+
+The SDK contains all the header files for the applications and libraries included in the image. 
+\footnote{Some documentation recommends to do {\bf bitbake meta-toolchain} or {\bf bitbake meta-toolchain-sdk}
+but for some reason, the static libraries does not seem to be included when you do it this way}
+
+\begin{verbatim}
+bitbake bitbake core-image-minimal -c populate_sdk
+\end{verbatim}
+
+\code{bitbake} will run for 2-3 hours, on a Core-i7 Quad-Core laptop.
+Expect up to 5-7 hours on a Core 2 Duo.
+Yocto shows a stack of current executing tasks,
+so you quickly get an idea about the time.
+ 
+The end result will be a script file in 
+\code{~/felabs/sysdev/poky/build/tmp/deploy/sdk}
+
+It is called \code{poky-eglibc-x86_64-core-image-minimal-armv7a-vfp-neon-toolchain-1.5.1.sh}
+or similar.
+
+\subchapter{Installing a cross-compiling toolchain built by Yocto}
+  {Objective: Install a well tested cross-compiling toolchain using the eglibc C
+  library}
+
+\section{Getting the Yocto SDK}
+
+If you have done the Extra Lab: \code{Building a cross-compiling toolchain using Yocto}, 
+you should have the file
+
+\code{poky-eglibc-x86_64-core-image-minimal-armv7a-vfp-neon-toolchain-1.5.1.sh}
+
+If not you will get it from your teacher.
+
+Make sure this script is executable (Normally it should be).
+
+\section{Installing the Cross-Compiler}
+
+Typically the compiler will be installed in \code{/opt/poky/1.5.1}
+
+You normally do not have write access to \code{/opt} so you should
+create the install directory before you install the cross-compiler.
+
+You will be asked where to install the cross-compiler, so an alternative 
+is to change the installation directory to somewhere where you do have write access.
+
+\begin{verbatim}
+sudo mkdir -p /opt/poky
+chown <you> /opt/poky
+\end{verbatim}
+
+Run the installation script.
+
+Edit the \code{environment-setup-armv7a-vfp-neon-poky-linux-gnueabi} file, 
+in the installation directory adding:
+
+\begin{verbatim}
+export CROSS_COMPILE=arm-poky-linux-gnueabi-
+\end{verbatim}
+
+You also need to fix LDFLAGS, which will cause problems with building U-Boot later.
+
+Comment away the existing definition of LDFLAGS and replace it with an empty defintion.
+
+\begin{verbatim}
+export LDFLAGS=""
+\end{verbatim}
+
+From the install directory, copy the 
+\code{environment-setup-armv7a-vfp-neon-poky-linux-gnueabi} to
+\code{toolchain.sh} in the \labdir directory, and make sure it is executable.
+
+If you are running any of the extra labs for creating a toolchain
+they may overwrite this file, so beware that you are not running
+the wrong cross-compiler. You could name it something else like
+\code{yocto-toolchain.sh}
+
+Now you can use the cross compiler by just sourcing this file.
+
+\begin{verbatim}
+source toolchain.sh
+\end{verbatim}
+
