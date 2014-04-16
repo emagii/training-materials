@@ -4,21 +4,22 @@ After this lab, you will be able to:
 \begin{itemize}
 \item Set up a cross-compiling environment
 \item Configure the kernel Makefile accordingly
-\item Cross compile the kernel for the IGEPv2 arm board
+\item Cross compile the kernel for the \devboard board
 \item Use U-Boot to download the kernel
 \item Check that the kernel you compiled starts the system
 \end{itemize}
 
 \section{Setup}
 
-Go to the \code{$HOME/felabs/sysdev/kernel} directory.
+Go to the \labdir and from there to the \code{kernel} subdirectory.
 
-Install the required packages:
+Install the required packages if you did not run \code{make prepare} before:
 
 \code{sudo apt-get install libqt4-dev u-boot-tools}
 
 \code{libqt4-dev} is needed for the \code{xconfig} kernel configuration interface, and \code{u-boot-tools}
-is needed to build an \code{uImage} kernel image file for U-Boot.
+is needed to build an \code{uImage} kernel image file for U-Boot. We will use the more modern \code{zImage}
+so it might not be needed.
 
 You should remove libqt3 development packages, using Synaptic if already present.
 
@@ -32,28 +33,34 @@ board.
 We will re-use the kernel sources downloaded and patched in the
 previous lab.
 
+\clearpage
 \section{Cross-compiling environment setup}
 
 To cross-compile Linux, you need to have a cross-compiling
 toolchain. We will use the cross-compiling toolchain that we
 previously produced, so we just need to make it available in the PATH:
 
-\begin{verbatim}
-export PATH=/usr/local/xtools/arm-unknown-linux-uclibcgnueabi/bin:$PATH
-\end{verbatim}
-
-Also, don't forget to either:
+Linux requires some environment variables to be set:
 
 \begin{itemize}
-\item Define the value of the \code{ARCH} and \code{CROSS_COMPILE}
-  variables in your environment (using \code{export})
-\item {\bf Or} specify them on the command line at every invocation of
-  \code{make}, i.e: \code{make ARCH=... CROSS_COMPILE=... <target>}
+\item \code{ARCH}
+\item \code{CROSS_COMPILE}
 \end{itemize}
+
+You can also specify them on the command line at every invocation of
+\code{make}, i.e: 
+
+\code{make ARCH=... CROSS_COMPILE=... <target>}
+
+Since we created a script file doing this we should just do:
+
+\begin{verbatim}
+source ../toolchain.sh
+\end{verbatim}
 
 \section{Linux kernel configuration}
 
-Find the proper Makefile target to configure the kernel for the Beaglebone Black board 
+Find the proper Makefile target to configure the kernel for the \devboard board 
 (hint: the default configuration is not named after the board, but after the CPU
 name=AM33XX). The configuration files are in \code{arch/arm/configs}
 
@@ -88,8 +95,11 @@ In the kernel configuration:
   in terms of compression ratio, at the expense of a higher
   decompression time. You find XZ in the \code{General Setup} menu.
 
-\end{itemize}
+\item Exit the configuration tool, and save the changes.  The result
+  is in the \code{.config} file.
 
+\end{itemize}
+\clearpage
 \section{Cross compiling}
 
 You're now ready to cross-compile your kernel. Simply run:
@@ -109,6 +119,8 @@ the kernel image. You can also see the Device Tree \code{.dtb} files
 which got compiled. Find which \code{.dtb} file corresponds to your
 board.
 
+Copy the \code{zImage} and DTB files to the directory exposed by the TFTP server.
+
 \section{Setting up serial communication with the board}
 
 Plug the Beaglebone Black board on your computer. Start Picocom on
@@ -119,86 +131,145 @@ to USB adapter.
 $ picocom -b 115200 /dev/ttyUSB0
 \end{verbatim}
 
+
+Once connected, reset the board, not forgetting to press the {\bf user button}.
+
+Press the {\bf return} key to stop U-Boot from executing the \code{bootcmd}.
+
 You should now see the U-Boot prompt:
 
 \begin{verbatim}
 U-Boot #
 \end{verbatim}
 
-Make sure that the bootargs U-Boot environment variable is not set (it
-could remain from a previous training session, and this could disturb
-the next lab):
-
-\begin{verbatim}
-setenv bootargs
-saveenv
-\end{verbatim}
-
+\clearpage
 \section{Load and boot the kernel using U-Boot}
 
-We will use TFTP to load the kernel image to the IGEP board:
+We will use TFTP to load the kernel image to the \devboard board:
 
 \begin{itemize}
 
-\item On your workstation, copy the \code{uImage} and DTB files to the
-  directory exposed by the TFTP server.
+\item On the target, set the networking information (use the real ip addresses)	\\
+  \code{setenv serverip 192.168.0.1}	\\
+  \code{setenv ipaddr 192.168.0.100}
+
+Make sure that the bootargs U-Boot environment variable is set (it
+could remain from a previous training session, and this could disturb
+the next lab). We will set it to use a ramdisk, but since we do not
+have the ramdisk, the kernel will abort.
+
+\begin{verbatim}
+setenv bootargs console=ttyO0,115200n8 root=/dev/ram0 rw ramdisk_size=65536 \
+  initrd=0x81000000,64M rootfstype=ext2
+\end{verbatim}
+
+Make sure the above line is a single line.
 
 \item On the target, load \code{zImage} from TFTP into RAM at address
-  0x80000000:\\
-  \code{tftp 0x80000000 zImage}
+  0x80200000:\\
+  \code{tftp 0x80200000 zImage}
 
-\item Now, also load the DTB file into RAM at address 0x81000000:\\
-  \code{tftp 0x81000000 am335x-boneblack.dtb}
+\item Now, also load the DTB file into RAM at address 0x82000000:\\
+  \code{tftp 0x80F80000 am335x-boneblack.dtb}
 
 \item Boot the kernel with its device tree:\\
-  \code{bootz 0x80000000 - 0x81000000}
+  \code{bootz 0x80200000 - 0x80F80000}
 
 \end{itemize}
 
 You should see Linux boot and finally hang with the following message:
 
 \begin{verbatim}
-Waiting for root device /dev/mmcblk0p2...
+Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(1,0)
 \end{verbatim}
 
 This is expected: we haven't provided a working root filesystem for
 our device yet.
 
+Reset the board once more ({\bf User Button}!) and wait until the 
+\code{bootcmd} has run its course.
+
+\begin{verbatim}
+run bootcmd
+\end{verbatim}
+
+Now the boot will proceed without a lot of user input, since everything is
+handled by the new environment.
+
+If you NFS is setup properly, the kernel may stop because of the below issue:
+
+\begin{verbatim}
+[    7.476715] devtmpfs: error mounting -2
+\end{verbatim}
+
+This happens because the kernel is trying to mount the {\em devtmpfs}
+filesystem in \code{/dev/} in the root filesystem. To address this,
+create a \code{dev} directory under \code{nfsroot} and reboot.
+
+Finally, the boot will terminate with the following error message:
+
+\begin{verbatim}
+Kernel panic - not syncing: No init found.  Try passing init= option to kernel. See Linux Documentation/init.txt for guidance. 
+\end{verbatim}
+
+The reason is that the root file system is empty, and the kernel does not find the \code{init} file.
+
+We will handle this in forthcoming labs.
+\clearpage
+\section{Automating the boot}
+
 You can now automate all this every time the board is booted or
 reset. Remove the micro-SD card and connect it to your host.
 
-Add the following to your \code{uEnv.txt}. Remember to run \code{sync} before removing the card.
+We will now change your \code{uEnv.txt}.
 
-{\scriptsize
+The only thing that needs to change, is to change
+the assignment to \code{bootcmd} to \code{uenvcmd}.
+
+Change the values below to fit your setup:
+
 \begin{verbatim}
-uenvcmd=tftp 80000000 zImage; tftp 81000000 am335x-boneblack.dtb; bootz 80000000 - 81000000
+serverip=192.168.0.1
+ipaddr=192.168.0.100
+loadaddr=0x80200000
+fdtaddr=0x80F80000
+HOME=/home/ulf
+console=ttyO0,115200n8
+nfsopts=nolock
+netargs=setenv bootargs console=${console} root=/dev/nfs \
+  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+tftp_kernel=tftp ${loadaddr} zImage
+tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
+bootkernel=bootz ${loadaddr} - ${fdtaddr}
+uenvcmd=run tftp_kernel tftp_dtb netargs bootkernel
+mmcboot=echo MMC boot disabled
+nandboot=echo NAND boot disabled
 \end{verbatim}
-}
+
+{\bf Note that the ’netargs’ line should be a single line.}
+
+Remember to run \code{sync} before removing the card.
 
 Reinsert the card in the Beaglebone Black and type
 
-{\scriptsize
 \begin{verbatim}
 reset
 \end{verbatim}
-}
 
-Check the date of the U-Boot build time. It will still be your own U-Boot, unless you
-removed power.
+Do not press the {\bf return} key, to let the \code{bootcmd} execute.
 
-On a system with NAND flash, you could do:
-{\scriptsize
-\begin{verbatim}
- setenv 'tftp 80000000 zImage; tftp 81000000 am335x-boneblack.dtb; bootz 80000000 - 81000000'
- saveenv
-\end{verbatim}
-}
+After loading the \code{uEnv.txt} environment, U-Boot is configured to test for
+the existence of the \code{uenvcmd} variable, and this will be run, if it exists.
 
+Since \code{uenvcmd} now is defined, the kernel will start to load, but will again abort due to no \code{init}.
+
+\clearpage
 \section{Flashing the kernel and DTB in NAND flash (Skip))}
 
 On a system with NAND Flash, you can program the kernel into the flash
 after downloading with TFTP. The Beaglebone Black does not have NAND Flash
-so this section is for reference only. Read through, but do not perform the commands.
+so this section is for reference only. Read through when you have time, 
+but do not perform the commands.
 
 In order to let the kernel boot on the board autonomously we can,
 on a board with NAND flash, flash the kernel image and DTB in the NAND flash. 
@@ -209,7 +280,7 @@ variables, we will keep special areas in NAND flash for the DTB
 and Linux kernel images:
 
 \begin{center}
-  \includegraphics[width=\textwidth]{labs/sysdev-kernel-cross-compiling/flash-map.pdf}
+  \includegraphics[width=\textwidth]{labs/sysdev-kernel-cross-compiling-BBB/flash-map.pdf}
 \end{center}
 
 So, let's start by erasing the corresponding 128 KiB of NAND flash
