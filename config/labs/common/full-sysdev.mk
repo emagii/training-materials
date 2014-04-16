@@ -23,7 +23,7 @@ endif
 
 LAB_HELPER+=full-sysdev-labs-help
 
-full-sysdev-labs.pdf:	SESSION_URL="${VENDOR_URL}/doc/training/sysdev"
+full-sysdev-labs.pdf:	SESSION_URL="${VENDOR_URL}doc/training/sysdev"
 
 full-sysdev-labs-help:
 	$(HELP) "full-sysdev-labs.pdf"			"Complete labs for the 'sysdev' course"
