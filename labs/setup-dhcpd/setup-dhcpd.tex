@@ -1,0 +1,99 @@
+\subchapter{Setting up a DHCP server}
+{Objective: Use a DHCP server on your USB Network port}
+
+After this lab, you will be able to communicate with your \devboard over the console
+
+\section{Install the DHCP daemon}
+
+\begin{verbatim}
+sudo apt-get install isc-dhcp-server
+\end{verbatim}
+
+
+
+\section{Configuring the DHCP server daemon}
+
+We need to setup
+
+\begin{itemize}
+\item /etc/default/isc-dhcp-server
+
+\begin{verbatim}
+#Defaults for dhcp initscript
+#sourced by /etc/init.d/dhcp
+#installed at /etc/default/isc-dhcp-server by the maintainer scripts
+#
+#This is a POSIX shell fragment
+#
+#On what interfaces should the DHCP server (dhcpd) serve DHCP requests"
+#Separate multiple interfaces with spaces, e.g. “eth0 eth1".
+INTERFACES="eth2"
+\end{verbatim}
+\end{itemize}
+
+The only relevant thing is the \code{INTERFACES} variable, which should be set
+to the same port as you use for communication with the \devboard
+
+\clearpage
+
+You also need to setup
+
+\begin{itemize}
+\item /etc/dhcp/dhcpd.conf
+
+\begin{verbatim}
+#
+#Sample configuration file for ISC dhcpd for Debian
+#
+#Attention: If /etc/ltsp/dhcpd.conf exists, that will be used as
+#configuration file instead of this file.
+#
+#
+....
+option domain-name “example.org”;
+option domain-name-servers ns1.example.org, ns2.example.org;
+option domain-name “emagii.com”;
+default-lease-time 600;
+max-lease-time 7200;
+log-facility local7;
+subnet 192.168.0.0 netmask 255.255.255.0 {
+range 192.168.0.10 192.168.0.100;
+option routers 192.168.0.1;
+option subnet-mask 255.255.255.0;
+option broadcast-address 192.168.0.254;
+option domain-name-servers 192.168.0.1;
+option ntp-servers 192.168.0.1;
+option netbios-name-servers 192.168.0.1;
+option netbios-node-type 8;
+ ......
+}
+\end{verbatim}
+\end{itemize}
+
+
+The interesting things here are 
+
+\begin{itemize}
+
+\item subnet: Any range which does not collide with your normal network
+
+\item server adress: We used the fix IP address of the USB Network adapter.
+
+\item range: A range of addresses inside the subnet, but not including the server.
+
+\end{itemize}
+
+
+\section{Activating the DHCP daemon}
+
+\begin{verbatim}
+sudo service isc-dhcp-server restart
+\end{verbatim}
+
+Check that it is running:
+
+\begin{verbatim}
+sudo netstat -uap
+\end{verbatim}
+
+Look for \code{dhcpd}
