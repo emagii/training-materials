@@ -71,14 +71,6 @@ Embedded Linux system development\\
     \newline People lacking experience on this topic should get
     trained by themselves with our freely available on-line slides
     (\url{http://free-electrons.com/docs/command-line/}).
-    \newline {\bf Experience in embedded Linux development}.
-    \newline Taking our Embedded Linux course
-    (\url{http://free-electrons.com/training/embedded-linux/})
-    first is not an absolute prerequisite, but it will definitely
-    help people lacking embedded Linux development experience.
-    They will understand the development environment
-    and board manipulations better, allowing them to concentrate on
-    kernel code programming.
     \\
     \hline
   \end{tabularx}
@@ -96,7 +88,7 @@ Embedded Linux system development\\
     {\bf Using Linux in a virtual machine is not supported}, because of issues
     connecting to real hardware.
 
-    \item We need \hostmachine or better.
+    \item Labs should be run on \hostmachine or better.
     \item {\bf Connection to the Internet} (direct or through the
     company proxy).
     \item {\bf PC computers with valuable data must be backed up}
@@ -116,7 +108,9 @@ Embedded Linux system development\\
     \hline
 
 \end{tabularx}}
+
 \normalsize
+\clearpage
 
 \feagendatwocolumn
 {Hardware}
@@ -163,108 +157,85 @@ Embedded Linux system development\\
 \clearpage
 \section{Day 1 - Morning}
 
-\feagendaonecolumn
-{Lecture - Introduction to the Linux kernel}
-{
-  \begin{itemize}
-  \item Kernel features
-  \item Understanding the development process.
-  \item Legal constraints with device drivers.
-  \item Kernel user interface (/proc and /sys)
-  \item Userspace device drivers
-  \end{itemize}
-}
-\\
 \feagendatwocolumn
-{Lecture - Kernel sources}
+{Lecture - Introduction to Embedded Linux}
 {
   \begin{itemize}
-  \item Specifics of Linux kernel development
-  \item Coding standards
-  \item Retrieving Linux kernel sources
-  \item Tour of the Linux kernel sources
-  \item Kernel source code browsers: cscope, Kscope, Linux Cross
-    Reference (LXR)
+  \item Advantages of Linux and open source for embedded systems
+  \item A few examples of embedded systems running linux
+  \item Embedded Hardware for Linux systems
+  \item Embedded Linux system architecture
   \end{itemize}
 }
-{Lab - Kernel sources}
+{Lab - Training Setup}
 {
   \begin{itemize}
-  \item Making searches in the Linux kernel sources: looking for C
-    definitions, for definitions of kernel configuration parameters,
-    and for other kinds of information.
-  \item Using the Unix command line and then kernel source code
-    browsers.
+  \item Install the Lab archives
  \end{itemize}
 }
-
 \section{Day 1 - Afternoon}
 \feagendatwocolumn
-{Lecture - Configuring, compiling and booting the Linux kernel}
+{Lecture - Cross Compiling Toolchains}
 {
   \begin{itemize}
-  \item Kernel configuration.
-  \item Native and cross-compilation. Generated files.
-  \item Booting the kernel. Kernel booting parameters.
-  \item Booting the kernel using NFS.
+  \item Definitions and Components
+  \item C Libraries
+  \item Toolchain Options
+  \item Obtaining a Toolchain
   \end{itemize}
 }
-{Lab - Kernel configuration, cross-compiling and booting on NFS}
+{Lab - Cross Compiling a toolchain}
 {
-  {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Configuring, cross-compiling and booting a Linux kernel with
-    NFS boot support.
-  \end{itemize}
+  \item Building a Yocto SDK
+  \item Configuring Crosstool-NG
+  \item Build a toolchain
+  \item Getting a free commercially supported toolchain (Sourcery)
+ \end{itemize}
 }
-\\
 \clearpage
 \section{Day 2 - Morning}
-
 \feagendatwocolumn
-{Lecture - Linux kernel modules}
+{Lecture - Bootloaders}
 {
   \begin{itemize}
-  \item Linux device drivers
-  \item A simple module
-  \item Programming constraints
-  \item Loading, unloading modules
-  \item Module dependencies
-  \item Adding sources to the kernel tree
+  \item Boot Sequence
+  \item The U-Boot Bootloader
   \end{itemize}
 }
-{Lab - Writing modules}
+{Lab - U-Boot}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Write a kernel module with several capabilities.
-  \item Access kernel internals from your module.
-  \item Setup the environment to compile it
+  \item Communication with the board using a serial console
+  \item Configure, Build and Install U-Boot
+  \item Learn U-Boot commands
+  \item Setup TFTP communications
   \end{itemize}
 }
 
 \section{Day 2 - Afternoon}
-
 \feagendatwocolumn
-{Lecture - Linux device model}
+{Lecture - Linux kernel Introduction}
 {
   \begin{itemize}
-  \item Understand how the kernel is designed to support device
-    drivers
-  \item The device model
-  \item Binding devices and drivers
-  \item Platform devices, Device Tree
-  \item Interface in userspace: \code{/sys}
+  \item Linux Features
+  \item Linux Versioning Schemes
+  \item Linux Kernel Sources
+  \item Kernel Configuration
+  \item Compiling and Installing the Kernel for the host
+  \item Cross-Compilining the kernel
+  \item Using kernel modules
   \end{itemize}
 }
-{Lab - Linux device model for an I2C driver}
+{Lab - Kernel cross-compiling}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Implement a driver that registers as an I2C driver
-  \item Modify the Device Tree to list an I2C device
-  \item Get the driver called when the I2C device is enumerated at
-    boot time
+  \item Set up the cross compiling environment
+  \item Configure the kernel using Kconfig
+  \item Cross-compile for an ARM platform
+  \item Boot the kernel
   \end{itemize}
 }
 
@@ -272,66 +243,74 @@ Embedded Linux system development\\
 \section{Day 3 - Morning}
 
 \feagendatwocolumn
-{Lecture - Introduction to the I2C API}
+{Lecture - Linux Root Filesystem}
 {
   \begin{itemize}
-  \item The I2C subsystem of the kernel
-  \item Details about the API provided to kernel drivers to interact
-    with I2C devices
+  \item Principle and solutions
+  \item Contents
+  \item Device Files
+  \item Virtual File Systems
+  \item Minimal File Systems
+  \item Busybox
   \end{itemize}
 }
-{Lecture - Pin muxing}
+{Lab - A tiny embedded systems} 
 {
   \begin{itemize}
-  \item Understand the {\em pinctrl} framework of the kernel
-  \item Understand how to configure the muxing of pins
-  \end{itemize}
-}
-
-\feagendaonecolumn
-{Lab - Communicate with the Nunchuk over I2C}
-{
-  {\em Using the BeagleBoneBlack}
-  \begin{itemize}
-  \item Configure the pin muxing for the I2C bus used to communicate
-    with the Nunchuk
-  \item Extend the I2C driver started in the previous lab to
-    communicate with the Nunchuk via I2C
+  \item Make linux boot using NFS
+  \item Configure and Create a minuimalistic Linux embedded system
+  \item Install and use Busybox
+  \item System startup with /sbin/init
+  \item Setup a simple web interface
+  \item Use shared libraries
   \end{itemize}
 }
 
 \section{Day 3 - Afternoon}
 
-\feagendaonecolumn
-{Lecture - Kernel frameworks}
-{
-  \begin{itemize}
-  \item Block vs. character devices
-  \item Interaction of userspace applications with the kernel
-  \item Details on character devices, \code{file_operations}, \code{ioctl()}, etc.
-  \item Exchanging data to/from userspace
-  \item The principle of kernel frameworks
-  \end{itemize}
-}
-
 \feagendatwocolumn
-{Lecture - The input subsystem}
+{Lecture - Block Filesystems}
 {
   \begin{itemize}
-  \item Principle of the kernel {\em input} subsystem
-  \item API offered to kernel drivers to expose input devices
-    capabilities to userspace application
-  \item Userspace API offered by the {\em input} subsystem
+  \item Difference vs Flash file systems
+  \item Devices
+  \item Traditional file systems (ext2,vfat)
+  \item Journalled file systems (ext3,ext4)
+  \item Filesystem recovery
+  \item Mounting filesystems
+  \item Squashfs
+  \item Tmpfs
   \end{itemize}
 }
-{Lab - Expose the Nunchuk functionality to userspace}
+{Lab - Block Filesystems}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Extend the Nunchuk driver to expose the Nunchuk features to
-    userspace applications, as a {\em input} device.
-  \item Test the operation of the Nunchuk using sample userspace
-    applications
+  \item Creating partitions
+  \item Booting with a mix of filesystems
+  \end{itemize}
+}
+\\
+\feagendatwocolumn
+{Lecture - Flash Filesystems}
+{
+  \begin{itemize}
+  \item The MTD subsystem
+  \item MTD partitions
+  \item JFFS2
+  \item Yaffs
+  \item UBI
+  \end{itemize}
+}
+{Lab - Block Filesystems}
+{
+  {\em Using the BeagleBoneBlack}
+  \begin{itemize}
+  \item Note: this lab needs revising, Beaglebone does not have NAND Flash
+  \item Note: Needs to show UBI
+  \item Creating partitions on flash storage
+  \item Read-Only JFFS2
+  \item Read-Write JFFS2
   \end{itemize}
 }
 
@@ -339,162 +318,92 @@ Embedded Linux system development\\
 \section{Day 4 - Morning}
 
 \feagendatwocolumn
-{Lecture - Memory management}
+{Lecture - Embedded Linux system development}
 {
   \begin{itemize}
-  \item Linux: memory management - Physical and virtual (kernel and user) address spaces.
-  \item Linux memory management implementation.
-  \item Allocating with \code{kmalloc()}.
-  \item Allocating by pages.
-  \item Allocating with \code{vmalloc()}.
+  \item Open Source components and licensing
+  \item Networking
+  \item System Utilities
+  \item Language Interpreters
+  \item Audio, Video and Multimedia
+  \item Graphical Toolkits
+  \item Databases
+  \item Web Browsers
+  \item Examples
   \end{itemize}
 }
-{Lecture - I/O memory and ports}
-{
-  \begin{itemize}
-  \item I/O register and memory range registration.
-  \item I/O register and memory access.
-  \item Read / write memory barriers.
-  \end{itemize}
-}
-
-\feagendaonecolumn
-{Lab - Minimal platform driver and access to I/O memory}
+{Lab - Manual cross-compiling}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Implement a minimal platform driver
-  \item Modify the Device Tree to instantiate the new serial port
-    device.
-  \item Reserve the I/O memory addresses used by the serial port.
-  \item Read device registers and write data to them, to send
-    characters on the serial port.
+  \item Manual cross-compiling applications and libraries
+  \item Common techniques and issues
   \end{itemize}
 }
-
+\\
 \section{Day 4 - Afternoon}
-
 \feagendatwocolumn
-{Lecture - The misc kernel subsystem}
+{Lecture - Build Systems}
 {
   \begin{itemize}
-  \item What the {\em misc} kernel subsystem is useful for
-  \item API of the {\em misc} kernel subsystem, both the kernel side
-    and userspace side
+  \item System Building
+  \item Commercial Linux solutions
   \end{itemize}
 }
-{Lab - Output-only serial port driver}
+{Lab - Buildroot}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Extend the driver started in the previous lab by registering
-    it into the {\em misc} subsystem
-  \item Implement serial port output functionality through the {\em
-      misc} subsystem
-  \item Test serial output from userspace
-  \end{itemize}
-}
-
-\feagendatwocolumn
-{Lecture - Processes, scheduling, sleeping and interrupts}
-{
-  \begin{itemize}
-  \item Process management in the Linux kernel.
-  \item The Linux kernel scheduler and how processes sleep.
-  \item Interrupt handling in device drivers: interrupt handler
-    registration and programming, scheduling deferred work.
-  \end{itemize}
-}
-{Lab - Sleeping and handling interrupts in a device driver}
-{
-  {\em Using the BeagleBoneBlack}
-  \begin{itemize}
-  \item Adding read capability to the character driver developed
-    earlier.
-  \item Register an interrupt handler.
-  \item Waiting for data to be available in the read file operation.
-  \item Waking up the code when data is available from the device.
+  \item Rebuilding using Buildroot
+  \item Adding your own DirectFB based application
   \end{itemize}
 }
 
 \clearpage
 \section{Day 5 - Morning}
-
 \feagendatwocolumn
-{Lecture - Locking}
+{Lecture - Embedded Linux application development}
 {
   \begin{itemize}
-  \item Issues with concurrent access to resources
-  \item Locking primitives: mutexes, semaphores, spinlocks.
-  \item Atomic operations.
-  \item Typical locking issues.
-  \item Using the lock validator to identify the sources of locking
-    problems.
+  \item Developing applications on embedded linux
+  \item Integrated development environment
+  \item Version Control Systems
+  \item Debuggers
+  \item Remote debugging
+  \item Memory checkers
+  \item System analysis
+  \item (Not) Developing on Windows
   \end{itemize}
 }
-{Lab - Locking}
+{Lab - Application Development and debugging}
 {
   {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Observe problems due to concurrent accesses to the device.
-  \item Add locking to the driver to fix these issues.
-  \end{itemize}
-}
-
-\feagendatwocolumn
-{Lecture - Driver debugging techniques}
-{
-  \begin{itemize}
-  \item Debugging with printk
-  \item Debugfs entries
-  \item Analyzing a kernel oops
-  \item Using kgdb, a kernel debugger
-  \item Using the Magic SysRq commands
-  \item Debugging through a JTAG probe
-  \end{itemize}
-}
-{Lab - Investigating kernel faults}
-{
-  {\em Using the BeagleBoneBlack}
-  \begin{itemize}
-  \item Studying a broken driver.
-  \item Analyzing a kernel fault and locating the problem in the
-    source code.
+  \item Compile your own application
+  \item Set up remote debugging
+  \item Debug a simple application
   \end{itemize}
 }
 
 \section{Day 5 - Afternoon}
-
 \feagendatwocolumn
-{Lecture - ARM board support and SoC support}
+{Lecture - Real-time in embedded linux systems}
 {
   \begin{itemize}
-  \item Understand the organization of the ARM support code
-  \item Understand how the kernel can be ported to a new hardware
-    board
+  \item PREEMPT\_RT
+  \item Real time extensions
+  \item Xenomai
   \end{itemize}
 }
-{Lecture - Power management}
+{Lab - Real-time}
 {
+  {\em Using the BeagleBoneBlack}
   \begin{itemize}
-  \item Overview of the power management features of the kernel
-  \item Topics covered: clocks, suspend and resume, dynamic frequency
-    scaling, saving power during idle, runtime power management,
-    regulators, etc.
+  \item Check Clock accuracy
+  \item Build a POSIX real-time application 
+  \item Build a Xenomai real-time application
+  \item Compare the two solutions
   \end{itemize}
 }
-
-\feagendaonecolumn
-{Lecture - The Linux kernel development process}
-{
-  \begin{itemize}
-  \item Organization of the kernel community
-  \item The release schedule and process: release candidates, stable
-    releases, long-term support, etc.
-  \item Legal aspects, licensing.
-  \item How to submit patches to contribute code to the community.
-  \end{itemize}
-}
-
 \end{document}
 
