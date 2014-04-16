@@ -10,7 +10,7 @@ endif
 
 LAB_HELPER+=full-buildroot-labs-help
 
-full-buildroot-labs.pdf:	SESSION_URL="${VENDOR_URL}/doc/training/buildroot"
+full-buildroot-labs.pdf:	SESSION_URL="${VENDOR_URL}doc/training/buildroot"
 
 full-buildroot-labs-help:
 	$(HELP) "full-buildroot-labs.pdf"		"Complete labs for the 'buildroot' course"
