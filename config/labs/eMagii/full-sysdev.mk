@@ -1,14 +1,14 @@
-SYSDEV_LABS   = setup-git \
+SYSDEV_LABS   = setup-ubuntu \
+		setup-git \
 		setup-emagii \
+		setup-applications-switcher \
 		setup-serial \
 		sysdev-SD-card \
 		setup-tftpd \
-		setup-tftpd-hpa \
 		setup-usbnet-startech \
 		setup-network \
 		setup-dhcpd \
 		setup-nfs \
-		setup-yocto-toolchain-1.5 \
 		setup-yocto-toolchain-1.6 \
 		setup-codesourcery \
 		sysdev-toolchain-made-easy-BBB \
@@ -17,10 +17,9 @@ SYSDEV_LABS   = setup-git \
 		sysdev-kernel-fetch-and-patch-BBB \
 		sysdev-kernel-cross-compiling-BBB \
 		sysdev-tinysystem-BBB \
-		sysdev-block-filesystems \
-		sysdev-flash-filesystems \
-		sysdev-thirdparty \
-		sysdev-buildroot \
+		sysdev-block-filesystems-BBB \
+		sysdev-thirdparty-BBB \
+		sysdev-buildroot-BBB \
 		sysdev-application-development \
 		sysdev-application-debugging \
 		sysdev-real-time \
