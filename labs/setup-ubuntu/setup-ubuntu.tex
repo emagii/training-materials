@@ -1,0 +1,106 @@
+\subchapter{Setting up Ubuntu}{General Setup of Ubuntu}
+
+\section{Install Synaptic}
+
+\begin{verbatim}
+$ sudo apt-get install synaptic
+$ sudo su
+$ synaptic&
+\end{verbatim}
+
+Start \code{synaptic} and install 
+
+
+\begin{itemize}
+
+\item \code{gnome}
+
+\item \code{nautilus-open-terminal}
+
+\item \code{git}
+
+\item \code{git-core}
+
+\item \code{samba}
+
+\item \code{system-config-samba}
+
+\end{itemize}
+
+Log out
+
+Click on the white \code{Ubuntu} button when you get the login screen
+and select the \code{Gnome Classic} option. Log again.
+
+\code{Gnome Classic} will from now be your default.
+
+\section{Open a terminal}
+
+Since you installed \code{nautilus-open-terminal}, you can open a terminal
+by right clicking the mouse, and select the terminal.
+
+
+\section{Make sure bash is the default shell}
+
+The normal Ubuntu installation uses the \code{dash} shell which won't work.
+
+Changed to the \code{bash} shell.
+
+\begin{verbatim}
+$ cd /bin/
+$ ls -l sh
+lrwxrwxrwx 1 root root 9 dec  6 15:25 sh -> /bin/dash
+$ sudo unlink sh
+$ sudo ln -s /bin/bash sh
+$ ls -l sh
+lrwxrwxrwx 1 root root 9 dec  6 15:25 sh -> /bin/bash
+\end{verbatim}
+
+\clearpage full-sysdev-labs.pdf 
+\section{Generate ssh keys}
+
+If you already have \code{rsa} keys in the \code{$HOME/.ssh} directory, 
+you can skip this step.
+
+If not, you generate the keys like this (Make sure you are not running as super-user)
+
+\begin{verbatim}
+$ ssh-keygen -t rsa
+\end{verbatim}
+
+Use the default location and provide a password (twice).
+
+This will generate 
+
+\begin{itemize}
+
+\item Private Key: \code{$HOME/.ssh/id_rsa}
+
+\item Public Key: \code{$HOME/.ssh/id_rsa.pub}
+
+\end{itemize}
+
+The {\bf Private Key} should {\bf never} be give out to anyone else.
+
+\section{Update Ubuntu to the latest package versions}
+
+Run the update manager, to update the machine.
+
+This will take some time.
+
+\begin{verbatim}
+Program->System Tools->Administration->Update
+\end{verbatim}
+
+\section{Make sure pkg-config works}
+
+Edit \code{${HOME}/.bashrc} and add
+
+\begin{verbatim}
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+\end{verbatim}
+
+
+
+You probably have to restart the computer afterwards.
+
