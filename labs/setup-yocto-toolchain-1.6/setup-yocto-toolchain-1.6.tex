@@ -4,6 +4,18 @@
 
 \section{This is an optional exercise for home}
 
+If you only want to download a the result of this lab, go to the next chapter.
+
+On a real fast machine like a Dell T7500 with 2 Xeon X5670 (2 x 6 cores/24 threads @ 2.93 GHz/96GB RAM),
+\code{bitbake} will run for an hour to complete the build.
+
+On a Core-i7 Quad-Core laptop, like the Dell E6520 with Core i7 2760m/16GB RAM, you should expect 3-4 hours.
+
+Expect a long, long time on a Core 2 Duo with small amount of RAM.
+
+Yocto shows a stack of current executing tasks, as well as to total number of tasks,
+so you quickly get an idea about the build time.
+
 After this lab, you will be able to:
 
 \begin{itemize}
@@ -25,7 +37,14 @@ make prepare
 \section{Getting Yocto}
 
 \begin{verbatim}
-git clone git://git.yoctoproject.org/poky
+git clone git://git.yoctoproject.org/poky poky-daisy
+\end{verbatim}
+
+Then checkout the daisy branch (Yocto-1.6).
+
+\begin{verbatim}
+cd poky-daisy
+git checkout -b daisy origin/daisy
 \end{verbatim}
 
 \clearpage
@@ -34,7 +53,7 @@ git clone git://git.yoctoproject.org/poky
 Once you have Yocto installed, you should configure it for your board.
 
 \begin{verbatim}
-cd poky
+cd poky-daisy
 . oe-init-build-env	build-beaglebone
 \end{verbatim}
 
@@ -83,6 +102,25 @@ If you use a common download directory, you might want to  change the DL\_DIR va
 If you have access with a DVD/USB memory with the tarballs, then you may
 want to copy those to the \code{build-beaglebone/downloads} directory to speed up the build.
 
+Change the package mechanism to ipk
+
+
+\begin{verbatim}
+# Package Management configuration
+#
+# This variable lists which packaging formats to enable. Multiple package backends 
+# can be enabled at once and the first item listed in the variable will be used 
+# to generate the root filesystems.
+# Options are:
+#  - 'package_deb' for debian style deb files
+#  - 'package_ipk' for ipk files are used by opkg (a debian style embedded package manager)
+#  - 'package_rpm' for rpm style packages
+# E.g.: PACKAGE_CLASSES ?= "package_rpm package_deb package_ipk"
+# We default to rpm:
+PACKAGE_CLASSES ?= "package_ipk"
+\end{verbatim}
+
+
 \clearpage
 \section{Building the Cross-Compiler}
 
@@ -96,24 +134,27 @@ The SDK contains all the header files for the applications and libraries include
 but for some reason, the static libraries does not seem to be included when you do it this way}
 
 \begin{verbatim}
-bitbake core-image-minimal
+time bitbake core-image-minimal
 \end{verbatim}
 
 followed by
 
 \begin{verbatim}
-bitbake core-image-minimal -c populate_sdk
+time bitbake core-image-minimal -c populate_sdk
 \end{verbatim}
 
-On a real fast machine (12 core/24 threads),
-\code{bitbake} will run for an hour to complete the build.
+\code{core-image-minimal} is just that, so you may want to build
+a more complete image/toolchain.
 
-On a Core-i7 Quad-Core laptop you should expect 3-4 hours.
+\begin{verbatim}
+time bitbake core-image-sato
+\end{verbatim}
 
-Expect up to 5-7 hours on a Core 2 Duo.
+followed by
 
-Yocto shows a stack of current executing tasks,
-so you quickly get an idea about the build time.
+\begin{verbatim}
+time bitbake core-image-sato -c populate_sdk
+\end{verbatim}
  
 The end result will be a script file in 
 \code{~/felabs/sysdev/poky/build/tmp/deploy/sdk}
@@ -122,6 +163,8 @@ It is called something similar to:
 
 \code{poky-eglibc-x86_64-core-image-minimal-armv7a-vfp-neon-toolchain-1.6.sh}
 
+(The version number may differ)
+
 \subchapter{Installing a cross-compiling toolchain built by Yocto}
   {Objective: Install a well tested cross-compiling toolchain using the eglibc C
   library}
@@ -129,14 +172,23 @@ It is called something similar to:
 \section{Getting the Yocto SDK}
 
 If you have done the Extra Lab: \code{Building a cross-compiling toolchain using Yocto}, 
-you should have the file
+you should have the file:
 
 \code{poky-eglibc-x86_64-core-image-minimal-armv7a-vfp-neon-toolchain-1.6.sh}
 
-If not you will get it from your teacher.
+or
+
+\code{poky-eglibc-x86_64-core-image-sato-armv7a-vfp-neon-toolchain-1.6.sh}
+
+or similar (the version number may differ)
+
+If not, You can download the toolchain from \code{ftp://ftp.emagii.com/pub/training/tools}
+or copy if from the DVD/USB stick, if you got it from your teacher.
+
+Install the latest version, and preferably \code{core-image-sato} over \code{core-image-minimal}.
 
 Make sure this script is executable (Normally it should be).
-
+chnmod
 \section{Installing the Cross-Compiler}
 
 Typically the compiler will be installed in \code{/opt/poky/1.6}
@@ -149,7 +201,7 @@ is to change the installation directory to somewhere where you do have write acc
 
 \begin{verbatim}
 sudo mkdir -p /opt/poky
-chown <you> /opt/poky
+sudo chown ${USER} /opt/poky
 \end{verbatim}
 
 Run the installation script.
@@ -157,11 +209,7 @@ Run the installation script.
 Edit the \code{environment-setup-armv7a-vfp-neon-poky-linux-gnueabi} file, 
 in the installation directory adding:
 
-\begin{verbatim}
-export CROSS_COMPILE=arm-poky-linux-gnueabi-
-\end{verbatim}
-
-You also need to fix LDFLAGS, which will cause problems with building U-Boot later.
+You will need to fix LDFLAGS, which will cause problems with building U-Boot later.
 
 Comment away the existing definition of LDFLAGS and replace it with an empty defintion.
 
@@ -182,5 +230,24 @@ Now you can use the cross compiler by just sourcing this file.
 
 \begin{verbatim}
 source toolchain.sh
+\end{verbatim}
+
+\section{Using the cross-compiler and sudo}
+
+Sometimes, the documentation may ask you do to:
+
+\begin{verbatim}
+sudo ${CROSS_COMPILE}<cmd>
+\end{verbatim}
+
+This actually does not work, since when you enter superuser mode, you
+lose your current environment and CROSS\_COMPILE becomes undefined.
+
+If you run into problems with this, you need to
+\begin{verbatim}
+sudo su
+source toolchain.sh
+${CROSS_COMPILE}<cmd>
+exit
 \end{verbatim}
 
