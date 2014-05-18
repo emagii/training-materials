@@ -19,10 +19,10 @@ identify the latest stable version.
 Just to make sure you know how to do it, check the version of the
 Linux kernel running on your machine.
 
-We will use \code{linux-3.13.x}, which this lab was tested with.
+We will use \code{linux-3.14.4}, which this lab was tested with.
 
-To practice the patch command later, download the full 3.13
-sources. Unpack the archive, which creates a \code{linux-3.13}
+If you want to practice the patch command later, download the full 3.14
+sources instead of the 3.14.4. Unpack the archive, which creates a \code{linux-3.14}
 directory. Remember that you can use \code{wget <URL>} on the command
 line to download files.
 
@@ -36,9 +36,9 @@ git commit -m "Initial Commit" -s
 \clearpage
 \section{Apply patches}
 
-Download the patch file corresponding to the latest 3.13.7 release:
+Download the patch file corresponding to the latest 3.14.4 release:
 Put the patch file in the parent directory of the kernel source.
-This will be used to update the kernel from 3.13 to 3.13.7.
+This will be used to update the kernel from 3.14 to 3.14.
 
 Patches are applied using the \code{patch} program which normally reads from \code{stdin},
 but you can supply a filename using the \code{-i} switch.
@@ -65,7 +65,7 @@ cat path/to/patch-x.y.z | patch -p1
 
 The downloaded patch is compressed. There is a way to apply a patch
 without uncompressing it first into a temporary file.
-Can you figure out how?
+Can you figure out how?\footnote{Think zcat, bzcat or xzcat}
 
 Without uncompressing it first (!), apply the patch to the Linux source directory.
 
@@ -87,4 +87,4 @@ How are added or removed files described?
 
 Remove the patch file after inspection.
 
-Rename the \code{linux-3.13} directory to \code{linux-3.13.7}.
+If you selected to patch the 3.14 kernel, rename the \code{linux-3.14} directory to \code{linux-3.14.4}.
