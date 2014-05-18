@@ -1,0 +1,183 @@
+\subchapter{Using a build system, example with Buildroot}{Objectives:
+  discover how a build system is used and how it works, with the
+  example of the Buildroot build system. Build a Linux system with
+  libraries}
+
+\section{Setup}
+
+Go to the \code{$HOME/felabs/sysdev/buildroot/} directory,
+which already contains some data needed for this lab, including a
+kernel image.
+
+\section{Get tarballs}
+If you have a slow internet connection, and have a DVD with the needed tarballs
+you can copy the \code{buildroot/download} directory on the DVD to 
+\code{$HOME/felabs/sysdev/buildroot/download} 
+
+\section{Get Buildroot and explore the source code}
+
+The official Buildroot website is available at
+\url{http://buildroot.org/}. Download the latest stable 2014.02.x
+version which we have tested for this lab. Uncompress the tarball
+and go inside the Buildroot source directory.
+
+Several subdirectories or files are visible, the most important ones
+are:
+
+\begin{itemize}
+\item \code{boot} contains the Makefiles and configuration items
+  related to the compilation of common bootloaders (Grub, U-Boot,
+  Barebox, etc.)
+\item \code{configs} contains a set of predefined configurations,
+  similar to the concept of defconfig in the kernel.
+  There is luckily a version for the \devboard.
+\item \code{docs} contains the documentation for Buildroot. You can
+  start reading buildroot.html which is the main Buildroot
+  documentation;
+\item \code{fs} contains the code used to generate the various root
+  filesystem image formats
+\item \code{linux} contains the Makefile and configuration items
+  related to the compilation of the Linux kernel
+\item \code{Makefile} is the main Makefile that we will use to use
+  Buildroot: everything works through Makefiles in Buildroot;
+\item \code{package} is a directory that contains all the Makefiles,
+  patches and configuration items to compile the userspace
+  applications and libraries of your embedded Linux system. Have a
+  look at various subdirectories and see what they contain;
+\item \code{system} contains the root filesystem skeleton and the {\em
+    device tables} used when a static \code{/dev} is used;
+\item \code{toolchain} contains the Makefiles, patches and
+  configuration items to generate the crosscompiling toolchain;
+\end{itemize}
+
+\section{Set the download directory}
+If you got the tarballs from a DVD, link the buildroot
+download directory \code{${TOPDIR}/dl} to your download directory.
+
+\begin{verbatim}
+ln -s ../download dl
+\end{verbatim}
+
+
+\section{Configure Buildroot}
+
+In our case, we would like to:
+
+\begin{itemize}
+\item Having Buildroot generate a toolchain for us;
+\item Generate an embedded Linux system for ARM;
+\item Integrate Busybox in our embedded Linux system;
+\item Integrate the target filesystem into both an ext4 filesystem
+  image and a tarball
+\end{itemize}
+
+To run the configuration utility of Buildroot, simply run:
+
+\begin{verbatim}
+make beaglebone_defconfig
+\end{verbatim}
+
+Then we want to customize the build.
+
+\begin{verbatim}
+make menuconfig
+\end{verbatim}
+
+Set the following options:
+
+\begin{itemize}
+\item \code{Toolchain}
+  \begin{itemize}
+  \item enable \code{Toolchain has large file support?}, 
+  \item enable \code{Toolchain has RPC support?}
+  \item enable \code{WCHAR support?}
+  \item enable \code{Toolchain has C++ support?}.
+  \item enable \code{Build cross-gdb for the host}.
+  \end{itemize}
+\item \code{Target packages}
+  \begin{itemize}
+  \item Keep \code{BusyBox} (default version) and keep the Busybox
+    configuration proposed by Buildroot;
+  \end{itemize}
+\item \code{Filesystem images}
+  \begin{itemize}
+  \item Select \code{ext2/3/4 root filesystem}
+  \item Select \code{tar the root filesystem with bzip2}
+  \end{itemize}
+\end{itemize}
+
+Exit the menuconfig interface. Your configuration has now been saved
+to the \code{.config} file.
+
+
+\section{Generate the embedded Linux system}
+
+Just run:
+
+\begin{verbatim}
+make
+\end{verbatim}
+
+Buildroot will download, extract, configure, compile and install each
+component of the embedded system.
+
+All the compilation has taken place in the \code{output/} subdirectory. Let's
+explore its contents:
+
+\begin{itemize}
+
+\item \code{build}, is the directory in which each component built by
+  Buildroot is extract, and where the build actually takes place
+
+\item \code{host}, is the directory where Buildroot installs some
+  components for the host. As Buildroot doesn't want to depend on too
+  many things installed in the developer machines, it installs some
+  tools needed to compile the packages for the target. In our case it
+  installed pkg-config (since the version of the host may be ancient)
+  and tools to generate the root filesystem image (genext2fs,
+  makedevs, fakeroot)
+
+\item \code{images}, which contains the final images produced by
+  Buildroot. In the normal case it's just an ext2 filesystem image and a
+  tarball of the filesystem, but depending on the Buildroot
+  configuration, there could also be a kernel image or a bootloader
+  image. This is where we find \code{rootfs.tar} and
+  \code{rootfs.ext2}, which are respectively the tarball and the ext2
+  image of the generated root filesystem.
+
+\item \code{staging}, which contains the “build” space of the target
+  system. All the target libraries, with headers, documentation. It
+  also contains the system headers and the C library, which in our
+  case have been copied from the cross-compiling toolchain.
+
+\item \code{target}, is the target root filesystem. All applications
+  and libraries, usually stripped, are installed in this
+  directory. However, it cannot be used directly as the root
+  filesystem, as all the device files are missing: it is not possible
+  to create them without being root, and Buildroot has a policy of not
+  running anything as root.
+
+\item \code{toolchain}, is the location where the toolchain is
+  built.
+
+\end{itemize}
+
+\section{Run the generated system}
+
+Create a directory where you extract the tarball.
+
+\begin{verbatim}
+sudo tar --numeric-owner -jxvf rootfs.tar.bz2
+\end{verbatim}
+
+Softlink \code{$(HOME)/rootfs} to this place and make sure you restart the NFS server.
+
+Copy the \code{zImage} and the device tree file to \code{/tftpboot}
+and boot using NFS.
+
+Use the \code{root} username, no password is required.
+
+
+
+
+
