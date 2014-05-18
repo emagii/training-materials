@@ -7,19 +7,14 @@ After this lab, you will be able to communicate with your \devboard over the con
 
 If you did not run \code{make prepare} in \labdir, you need to do this now.
 
+This will install \code{picocom} and make your user belong to the \code{dialout} 
+group to be allowed to write to the serial console:
+
 Alternatively:
 
-{\small
-{\tt
-sudo apt-get install picocom
-}
-}
-
-You also need to make your user belong to the \code{dialout} group to be
-allowed to write to the serial console:
-
 \begin{verbatim}
-sudo adduser $USER dialout
+sudo apt-get install picocom
+sudo adduser ${USER} dialout
 \end{verbatim}
 
 \section{Setting up serial communication with the board}
@@ -54,4 +49,3 @@ to start serial communication on \code{/dev/ttyUSB0}, with a baudrate of 115200.
 If you wish to exit \code{picocom}, press \code{[Ctrl][a]} followed by
 \code{[Ctrl][x]}.
 
-You should now set up your git personal information
