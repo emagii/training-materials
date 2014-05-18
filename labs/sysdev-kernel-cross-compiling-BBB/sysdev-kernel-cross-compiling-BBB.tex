@@ -34,6 +34,65 @@ We will re-use the kernel sources downloaded and patched in the
 previous lab.
 
 \clearpage
+
+\section{Linux kernel configuration}
+
+Find the proper Makefile target to configure the kernel for the \devboard board 
+(hint: the default configuration is not named after the board, but is related to the CPU
+name=AM33XX). The configuration files are in \code{arch/arm/configs}.
+Find a suitable configuration, and check with the teacher, if it is OK.
+
+Once found, use this target to configure the kernel with the
+ready-made configuration through:
+
+\code{ARCH=arm make <board>_defconfig}
+
+Don't hesitate to visualize the new settings by running
+\code{make xconfig} afterwards!
+
+This may fail, if libqt3 is installed and used during make.
+Deinstall libqt3 headers and retry.
+
+Another reason is that \code{PKG_CONFIG_PATH} is not set up.
+
+\begin{verbatim}
+export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+\end{verbatim}
+
+The \code{toolchain.sh} file changes some critical things, which breaks
+the kernel configuration make targets.
+
+If you have sourced the file, qt development libraries will not be found.
+
+If you get mystic error messages regarding \code{qt-mt.pc}
+you may have to reset by \code{make distclean} and redo:
+
+\code{make <board>_defconfig}
+
+In the kernel configuration:
+
+\begin{itemize}
+
+\item In the \code{System Type} menu, make sure that \code{TI AM33XX} is selected.
+  Otherwise, you do not have the correct \code{<board>_defconfig}
+  We will boot our kernel with a device tree for our board so
+  technically speaking, you can leave this option enabled,
+  and still boot using a {\em Device Tree}, 
+
+\item As an experiment, let's change the kernel compression from Gzip
+  to XZ. This compression algorithm is far more efficient than Gzip,
+  in terms of compression ratio, at the expense of a higher
+  decompression time. You find XZ in the \code{General Setup} menu.
+
+\item Make sure that SquashFS, ext3 and ext4 filesystems are supported.
+
+\item Make sure that the AM335x Framebuffer is supported
+
+\item Exit the configuration tool, and save the changes.  The result
+  is in the \code{.config} file.
+
+\end{itemize}
+
 \section{Cross-compiling environment setup}
 
 To cross-compile Linux, you need to have a cross-compiling
@@ -58,66 +117,47 @@ Since we created a script file doing this we should just do:
 source ../toolchain.sh
 \end{verbatim}
 
-\section{Linux kernel configuration}
-
-Find the proper Makefile target to configure the kernel for the \devboard board 
-(hint: the default configuration is not named after the board, but after the CPU
-name=AM33XX). The configuration files are in \code{arch/arm/configs}
-
-Once found, use this target to configure the kernel with the
-ready-made configuration through:
-
-\code{make <board>_defconfig}
-
-Don't hesitate to visualize the new settings by running
-\code{make xconfig} afterwards!
-
-This may fail, if libqt3 is installed and used during make.
-Deinstall libqt3 headers and retry.
-
-If you get mystic error messages regarding \code{qt-mt.pc}
-you may have to reset by \code{make distclean} and redo:
-
-\code{make <board>_defconfig}
-
-In the kernel configuration:
-
-\begin{itemize}
-
-\item In the \code{System Type} menu, make sure that \code{TI AM33XX} is selected.
-  Otherwise, you do not have the correct \code{<board>_defconfig}
-  We will boot our kernel with a device tree for our board so
-  technically speaking, you can leave this option enabled,
-  and still boot using a {\em Device Tree}, 
-
-\item As an experiment, let's change the kernel compression from Gzip
-  to XZ. This compression algorithm is far more efficient than Gzip,
-  in terms of compression ratio, at the expense of a higher
-  decompression time. You find XZ in the \code{General Setup} menu.
-
-\item Exit the configuration tool, and save the changes.  The result
-  is in the \code{.config} file.
-
-\end{itemize}
 \clearpage
 \section{Cross compiling}
 
 You're now ready to cross-compile your kernel. Simply run:
 
 \begin{verbatim}
-make LOADADDR=0x80008000 zImage
+make -j <n> LOADADDR=0x80008000 zImage
 \end{verbatim}
-
-The \code{LOADADDR} indicates to U-Boot where the kernel image should
-be loaded.
 
 and wait a while for the kernel to compile. Don't forget to use
 \code{make -j<n>} if you have multiple cores on your machine!
 
+The \code{LOADADDR} indicates to U-Boot where the kernel image should
+be loaded.
+
 Look at the end of the kernel build output to see which file contains
-the kernel image. You can also see the Device Tree \code{.dtb} files
-which got compiled. Find which \code{.dtb} file corresponds to your
-board.
+the kernel image. 
+
+Next you need to build the device tree files.
+
+\begin{verbatim}
+make dtbs
+\end{verbatim}
+
+You can see the Device Tree \code{.dtb} files which got compiled. 
+Find which \code{.dtb} file corresponds to your board.
+
+The kernel support dynamically loaded modules, which needs to be built separately.
+
+\begin{verbatim}
+make modules
+\end{verbatim}
+
+Install the modules in the \code{${HOME}/rootfs} directory.
+We will not use them right now, but we will need them later.
+ 
+\begin{verbatim}
+make INSTALL_MOD_PATH=${HOME}/rootfs modules_install
+\end{verbatim}
+
+Check the contents of the \code{${HOME}/rootfs} directory. There should be a \code{lib} directory.
 
 Copy the \code{zImage} and DTB files to the directory exposed by the TFTP server.
 
@@ -146,6 +186,11 @@ U-Boot #
 \section{Load and boot the kernel using U-Boot}
 
 We will use TFTP to load the kernel image to the \devboard board:
+
+You need give a number of commands to boot the kernel, 
+Note that you may already have done this for some in the \code{uSetup.txt} file.
+
+Check variables with \code{print}.
 
 \begin{itemize}
 
