@@ -1,0 +1,32 @@
+\subchapter{Setting up Applications Switcher}{How to get multiple workspaces in Ubuntu 12.04}
+
+Use {\bf \code{Gnome Classic (no effects)}} when you log in.
+
+With effects:
+
+Install Compiz Config Settings Manager:
+
+To open terminal hit Alt+Ctrl+T and run following commands:
+
+\begin{verbatim}
+sudo apt-get install compizconfig-settings-manager
+\end{verbatim}
+
+Then go to system tools > preferences > compizconfig
+
+Go at the very bottom where it says windows management
+
+Put a checkmark in application switcher and exit.
+
+Then you need to setup the \code{wmctrl} CLI for talking to X.
+\begin{verbatim}
+sudo apt-get install wmctrl
+\end{verbatim}
+
+
+Click on the cogwheel icon in the upper right corner and select startup programs
+
+Add \code{wmctrl -n 1}
+
+To be continued...
+
