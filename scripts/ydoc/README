@@ -1,0 +1,52 @@
+The 'ydoc' class and packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+'ydoc' provides macros and environments to document LaTeX packages and classes.
+It is an alternative to the 'ltxdoc' class and 'doc' package.
+It targets a different layout and tries to provide more modern styles (xcolor, hyperref, etc.).
+
+This is an alpha release. It should not be used yet for other packages.
+
+INSTALL
+~~~~~~~
+
+This package might be part of your LaTeX distribution (TeX Live, MikTeX, ...) and then is installable using
+the distributions package manager (TeX Live: 'tlmgr install ydoc').
+However, it is also manually installable using the following ways:
+
+1) TDS ZIP FILE
+A TDS ZIP file includes all files in a installable format and using the required directory structure.
+Simply unzip the TDS ZIP file over your TEXMF tree.
+
+The TDS ZIP file can be downloaded from CTAN:
+http://mirrors.ctan.org/install/macros/latex/contrib/ydoc.tds.zip
+
+
+2) DTX FILE
+The 'ydoc.dtx' file includes all required files, which can be extracted by compiling it using TeX (not LaTeX):
+
+    tex ydoc.dtx
+
+To build the documentation compile the same file using LaTeX (preferable 'pdflatex') multiple times:
+
+    pdflatex ydoc.dtx
+    pdflatex ydoc.dtx
+    pdflatex ydoc.dtx
+
+Copy all files to their correct location of your local TEXMF tree.
+For example under Linux a personal TEXMF is normally located at '~/texmf' ('$HOME/texmf').
+The files can be installed using the following Linux commands. For 
+
+    mkdir -p "${TEXMF}/tex/latex/ydoc/"
+    mkdir -p "${TEXMF}/source/latex/ydoc/"
+    mkdir -p "${TEXMF}/doc/latex/ydoc/"
+    mkdir -p "${TEXMF}/tex/generic/ydoc/"
+    cp ydoc.sty ydoc.cls ydoc-code.sty ydoc-desc.sty ydoc-doc.sty ydoc-expl.sty ydoc.cfg "${TEXMF}/tex/latex/ydoc"
+    cp ydoc.dtx ydoc.ins "${TEXMF}/source/latex/ydoc"
+    cp ydoc.pdf README "${TEXMF}/doc/latex/ydoc"
+    cp ydocincl.tex ydocstrip.tex "${TEXMF}/tex/generic/ydoc"
+
+Update the tree database file (might be not required for modern versions and personal TEXMF trees):
+
+    texhash ${TEXMF}
+

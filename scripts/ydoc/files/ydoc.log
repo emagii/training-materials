@@ -1,0 +1,111 @@
+This is TeX, Version 3.1415926 (TeX Live 2009/Debian) (format=tex 2013.11.19)  3 MAR 2014 21:19
+**ydoc.dtx
+(./ydoc.dtx (/usr/share/texmf-texlive/tex/latex/base/docstrip.tex
+\blockLevel=\count26
+\emptyLines=\count27
+\processedLines=\count28
+\commentsRemoved=\count29
+\commentsPassed=\count30
+\codeLinesPassed=\count31
+\TotalprocessedLines=\count32
+\TotalcommentsRemoved=\count33
+\TotalcommentsPassed=\count34
+\TotalcodeLinesPassed=\count35
+\NumberOfFiles=\count36
+\inFile=\read0
+\inputcheck=\read1
+\@tempcnta=\count37
+\off@0=\count38
+\off@1=\count39
+\off@2=\count40
+\off@3=\count41
+\off@4=\count42
+\off@5=\count43
+\off@6=\count44
+\off@7=\count45
+\off@8=\count46
+\off@9=\count47
+\off@10=\count48
+\off@11=\count49
+\off@12=\count50
+\off@13=\count51
+\off@14=\count52
+\off@15=\count53
+\@temptokena=\toks12
+\@maxfiles=\count54
+\@maxoutfiles=\count55
+
+Utility: `docstrip' 2.5d <2005/07/29>
+English documentation    <1999/03/31>
+
+**********************************************************
+* This program converts documented macro-files into fast *
+* loadable files by stripping off (nearly) all comments! *
+**********************************************************
+
+********************************************************
+* No Configuration file found, using default settings. *
+********************************************************
+
+)
+
+Generating file(s) ydocstrip.tex ydocincl.tex ydoc.ins ydoc.cls ydoc.sty ydoc.c
+fg ydoc-code.sty ydoc-desc.sty ydoc-expl.sty ydoc-doc.sty 
+\openout0 = `ydocstrip.tex'.
+
+\openout1 = `ydocincl.tex'.
+
+\openout2 = `ydoc.ins'.
+
+\openout3 = `ydoc.cls'.
+
+\openout4 = `ydoc.sty'.
+
+\openout5 = `ydoc.cfg'.
+
+\openout6 = `ydoc-code.sty'.
+
+\openout7 = `ydoc-desc.sty'.
+
+\openout8 = `ydoc-expl.sty'.
+
+\openout9 = `ydoc-doc.sty'.
+
+
+Processing file ydoc.dtx (ydocstrip.tex) -> ydocstrip.tex
+                         (ydocincl.tex) -> ydocincl.tex
+                         (ydoc.ins) -> ydoc.ins
+                         (ydoc.cls) -> ydoc.cls
+                         (ydoc.sty) -> ydoc.sty
+                         (ydoc.cfg) -> ydoc.cfg
+                         (ydoc-code.sty) -> ydoc-code.sty
+                         (ydoc-desc.sty) -> ydoc-desc.sty
+                         (ydoc-expl.sty) -> ydoc-expl.sty
+                         (ydoc-doc.sty) -> ydoc-doc.sty
+Lines  processed: 2890
+Comments removed: 1334
+Comments  passed: 21
+Codelines passed: 1471
+
+*************************************************************
+*                                                           *
+* To finish the installation you have to move the following *
+* file into a directory searched by TeX:                    *
+*                                                           *
+*     ydoc.cls                                              *
+*     ydoc.sty                                              *
+*     ydoc-code.sty                                         *
+*     ydoc-desc.sty                                         *
+*     ydoc-expl.sty                                         *
+*     ydoc-doc.sty                                          *
+*     ydocstrip.tex                                         *
+*     ydocincl.tex                                          *
+*                                                           *
+* To produce the documentation run the file ydoc.dtx        *
+* through LaTeX.                                            *
+*                                                           *
+* Happy TeXing!                                             *
+*                                                           *
+*************************************************************
+ )
+No pages of output.
