@@ -135,7 +135,7 @@ If not,install the required packages:
 sudo apt-get install libglade2-dev libglib2.0-dev libgtk2.0-dev
 \end{verbatim}
 
-Unpack the busybox sources. The initialize an empty git.
+Unpack the busybox sources. Then initialize an empty git.
 
 Apply the patches found in the \code{patches} subdirectory of {tinysystem}, in alphabetical order.
 
@@ -182,13 +182,48 @@ Specify the installation directory for BusyBox
 \code{Install Options -> BusyBox installation prefix}.}.
 It should be the path to your \code{nfsroot} directory.
 
+Alternatively, you can set \code{_install} directory as a dynamic link
+to \code{${HOME}/rootfs}
+
 Exit the configuration, saving changes.
 
 \section{Building Busybox}
 
-Start the build by typing \code{make}
+Source the \code{toolchain.sh} script and start the build by typing \code{make}
 
-Now run \code{sudo make install} to install BusyBox in the \code{nfsroot} directory.
+Once the build completes, you need to install the result in the \code{nfsroot} directory.
+
+If you just type \code{make install} all files will be installed with You as the owner,
+but the proper owner for these files is \code{root}.
+
+If you \code{sudo make install}, the files will be installed with the proper owner,
+but you will also clear the environment, which means that \code{ARCH} is empty,
+and defaults to the host machine \code{x86_64}. This means that all files compiled for ARM, 
+will be recompiled, and you get a busybox image for the host, instead of for the \devboard.
+
+The proper way, is to enter superuser modes, setup the environment, and then install
+
+\begin{verbatim}
+sudo su
+source toolchain.sh
+ln -s <your home>/rootfs _installreboot
+make install
+\end{verbatim}
+
+Verify that you have the right architecture, by entering the \code{${HOME}/rootfs/bin}
+directory and run readelf on \code{busybox}.
+
+Creqate an executable file and source it.
+
+\begin{verbatim}
+#!/bin/sh
+export SDK=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux
+export GNUTOOLS=${SDK}/usr/bin/arm-poky-linux-gnueabi
+export PATH=${GNUTOOLS}:${PATH}
+export CROSS_COMPILE=arm-poky-linux-gnueabi-
+\end{verbatim}
+
+Then You can test by \code{arm-poky-linux-gnueabi-readelf -a busybox}
 
 Also create a \code{dev} directory in \code{nfsroot} if it does not exist.
 
@@ -231,6 +266,7 @@ In the BusyBox sources, read details about \code{/etc/inittab} in the
 Then, create a \code{/etc/inittab} file and a \code{/etc/init.d/rcS}
 startup script declared in \code{/etc/inittab}. In this startup
 script, mount the \code{/proc} and \code{/sys} filesystems.
+Reboot and check the contents. They should not be empty.
 
 Any issue after doing this?
 
@@ -252,18 +288,18 @@ Try run \code{Hello} on the \devboard. This should work OK.
 Then try to run \code{hello}
 
 You will first encounter a \code{not found} error caused by the absence of
-the \code{ld-linux.so.3} executable, which is the dynamic linker
+the \code{ld-linux-armhf.so.3} executable, which is the dynamic linker
 required to execute any program compiled with shared libraries. Using
 the find command (see examples in your command memento sheet), look
 for this file in the toolchain install directory.
 
-This turions out to be a link to ${ld-2.18.so}, so copy ${ld-2.18.so}
-to the \code{lib/} directory on the target.
+This turns out to be a link to \code{ld-2.19.so}, so copy \code{ld-2.19.so}
+to the \code{lib/} directory of the target.
 
 Setup the link:
 
 \begin{verbatim}
-ln -s ld-2.18.so /lib/ld-linux.so.3
+ln -s ld-2.19.so /lib/ld-linux-armhf.so.3
 \end{verbatim}
 
 Then, running the executable again and see that the loader executes
@@ -272,7 +308,7 @@ these libraries in the toolchain and copy them to \code{lib/} on the
 target. Setup any needed links.
 
 \begin{verbatim}
-ln -s libc-2.18.so libc.so.6
+ln -s libc-2.19.so libc.so.6
 \end{verbatim}
 
 Once the small test program works, we are going to recompile Busybox
@@ -281,8 +317,17 @@ shared libraries that are now present on the target.
 
 Before doing that, measure the size of the \code{busybox} executable.
 
-Then, build Busybox with shared libraries, and install it again on the
-target filesystem. Make sure that the system still boots and see
+Rename the \code{${HOME}/rootfs} directory to  \code{${HOME}/rootfs.static}
+and create a new \code{${HOME}/rootfs}.
+
+Restart the \code{nfs-kernel-server}, so NFS still works.
+
+Build Busybox with shared libraries, and install it on the target filesystem. 
+Use the \code{busybox-1.22.1.config.httpd} as your config.
+
+Copy non busybox parts from the previous build.
+
+Make sure that the system still boots and see
 how much smaller the \code{busybox} executable got.
 
 \section{Implement a web interface for your device}
@@ -291,7 +336,7 @@ Replicate \code{data/www/} to the \code{/www} directory in your target root file
 
 Now, run the BusyBox http server from the target command line:
 
-\begin{verbatim}
+\begin{verbatim}/
 /usr/sbin/httpd -h /www/
 \end{verbatim}
 
