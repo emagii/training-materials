@@ -1,4 +1,4 @@
-\subchapter{Setting up the NFS server}{Objective: Prepare the host for NFS booting}
+\subchapter{Setting up an NFS server}{Objective: Prepare the host for NFS booting}
 
 \section{Install the NFS Server}
 
@@ -54,3 +54,10 @@ alternatively:
 sudo exportfs -av
 \end{verbatim}
 
+You can test your NFS setup by:
+
+\begin{verbatim}
+sudo mount -t nfs localhost:/home/ulf/rootfs
+\end{verbatim}
+
+Replace \code{ulf} with your username.
