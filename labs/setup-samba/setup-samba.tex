@@ -1,0 +1,32 @@
+\subchapter{Samba Setup}{Open up the lab directory}
+
+\section{Install Samba}
+
+If you did not run \code{make prepare}, 
+install \code{samba} and \code{system-config-samba}
+using \code{synaptic} or \code{apt-get}, 
+
+Create the \code{$HOME/common} directory.
+
+Using the Menusystem, open the \code{samba} configuration utility.
+
+\begin{verbatim}
+Program->System Tools->Administration->Samba
+\end{verbatim}
+
+In the server configuration, make sure your workgroup is {\bf emagii} during the labs.
+
+Export the \code{common} directory.
+
+Make it visible and writeable and give access to everyone.
+
+If you want the teacher to be able to access your lab directory, 
+you should create the user \teacher, and export the \labdir directory,
+making it visible and writeable to \teacher.
+
+After reconfiguring samba, you need to restart with the new configuration.
+
+\begin{verbatim}
+sudo service smbd restart
+sudo service nmbd restart
+\end{verbatim}
