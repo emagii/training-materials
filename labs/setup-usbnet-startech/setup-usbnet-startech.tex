@@ -1,12 +1,13 @@
 \subchapter{Setting up a Startech USB - Ethernet adapter}
 {Objective: Get a dedicated network port for communication with the \devboard}
 
-After this lab, you have a second network port allowing you to nfs-mount the \devboard
+After this lab, you have prepared for a second network port allowing you to nfs-mount the \devboard
 root filesystem without changing the network settings of the primary network port.
 
 \section{Prerequisites}
 
-You need a {\bf Startech USB31000SW USB Ethernet}  adapter
+You need a {\bf Startech USB31000SW USB Ethernet} adapter to use the port, but the driver
+can be installed without the Adapter.
 
 It is assumed, that your system is setup to build kernel modules.
 
@@ -26,10 +27,10 @@ Go to the \labdir directory
 
 The \code{network/startech} directory contains a tarball with the driver.
 
-The tarball has been downloaded from the Startech website, and slightly
-modified to allow it to build.
+The tarball has been downloaded from the Startech website, and will be slightly
+modified using a patch to allow it to build.
 
-You can compile and install the driver by:
+From the \labdir directory, You can compile and install the driver by:
 
 \begin{verbatim}
 sudo make -C network startech-usb
@@ -38,6 +39,8 @@ sudo make -C network startech-usb
 \section{Build and install the kernel driver outside the lab}
 
 Extract the tarball, and enter the source directory.
+
+Apply the patches from the \code{../patches} directory
 
 \begin{verbatim}
 make
