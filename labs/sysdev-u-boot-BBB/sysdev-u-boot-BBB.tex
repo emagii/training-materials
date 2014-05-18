@@ -1,6 +1,5 @@
-\subchapter{Bootloader - U-Boot}{Objectives: Set up serial
-  communication, compile and install the U-Boot bootloader, use basic
-  U-Boot commands, set up TFTP communication with the development
+\subchapter{Bootloader - U-Boot}{Objectives: Compile and install the U-Boot bootloader, 
+  use basic U-Boot commands, set up TFTP communication with the development
   workstation.}
 
 As the bootloader is the first piece of software executed by a
@@ -222,7 +221,15 @@ You can now copy the generated \code{MLO} and \code{u-boot.img} files
 to the SD card FAT partition. \code{MLO} is the first stage bootloader,
 \code{u-boot.img} is the second stage bootloader.
 
-You should also create a file \code{uEnv.txt} looking like:
+Normally, \code{u-boot} executed the \code{bootcmd} which reads the
+\code{uEnv.txt} which modifies the boot. The problem with this approach, is
+that you cannot stop the boot.
+
+Our patch (which is not standard) will start by reading the \code{uSetup.txt}
+before \code{bootcmd} is executed, so you have a chance to stop the boot,
+by pressing{\bf return}.
+
+You should create the file \code{uSetup.txt} looking like:
 
 \begin{verbatim}
 ipaddr=192.168.0.100
@@ -233,25 +240,27 @@ HOME=/home/ulf
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-   nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+	nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}
 bootcmd=run tftp_kernel tftp_dtb netargs bootkernel
-mmcboot=echo MMC boot disabled
+mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} \
+	rootfstype=${mmcrootfstype} rootwait
+mmcrootfstype=squashfs
 nandboot=echo NAND boot disabled
 \end{verbatim}
 
 (Caution: in \code{ttyO2} above, it's the capital letter \code{O}, like in
 {\bf O}MAP and not the number zero)
 
-{\bf Note that the 'netargs' line should be a single line.}
+{\bf Note that the 'netargs' and 'mmcargs' lines should be a single line.}
 
 You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
 
 You should also use your own {\bf \code{$HOME}}.
 
-Copy \code{uEnv.txt} it to the FAT partition.
+Copy \code{uSetup.txt} it to the FAT partition and also create an empty \code{uEnv.txt} in the same place.
 
 Run \code{sudo sync} to make sure it is properly copied
 
@@ -321,7 +330,7 @@ When U-Boot initializes, it will execute the contents of the \code{bootcmd} vari
 Before that happens, it will wait for a few seconds (value of \code{bootdelay}) giving
 the user a chance to stop the boot. 
 
-Press the \code{<return>} button before the counter expires, to enter the U-Boot shell.
+www.kwewww.kernel.Press the \code{<return>} button before the counter expires, to enter the U-Boot shell.
 
  (You may have to reset the Beaglebone if you
 did not manage to press the \code{<return>} button in time)
