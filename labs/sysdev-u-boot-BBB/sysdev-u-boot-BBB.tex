@@ -66,13 +66,22 @@ git commit -m "Initial Commit" -s
 The '-m' switch will tell git to use the following string as the commit message,
 and the '-s' switch will sign the commit with your user info as defined above.
 
-The \code{0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch} patch from
-this lab's \code{data} directory should be applied:
+We will apply two patches that are in the \code{data} directory that needs to be applied.
+
+\begin{itemize}
+\item \code{0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch}
+	This is a minor fix for a device driver.
+
+\item \code{0002-Read-environment-from-uSetup.txt-at-boot-if-present.patch}
+	This is a fix which adds a significant functionality to the bootloader
+	and is neccessary for the labs.
+
+\end{itemize}
 
 The traditional way is to \code{'cat'} the patch and pipe it through the \code{'patch'} utility,
 but we will do it using git instead
 
-Traditional Way:
+Example: Applying a patch in the traditional Way:
 {\small
 \begin{verbatim}
 cat /path/to/0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch | \
@@ -80,7 +89,7 @@ cat /path/to/0001-arm-omap-i2c-don-t-zero-cnt-in-i2c_write.patch | \
 \end{verbatim}
 }
 
-Patch using git:
+Example: applying a patch using git:
 
 {\small
 \begin{verbatim}
@@ -94,6 +103,12 @@ when you use "git am", since it will only accept well formed patches.
 
 If a patch fails, then it will give you different options on how to handle the problem.
 
+Apply the patch.
+
+\begin{verbatim}
+cd u-boot-2013.10
+git am ../data/*.patch
+\end{verbatim}
 
 Patching with ''git am' should succeed, if you did not patch using the traditional way first.
 
