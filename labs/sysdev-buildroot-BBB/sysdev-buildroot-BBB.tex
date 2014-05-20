@@ -170,7 +170,7 @@ Create a directory where you extract the tarball.
 sudo tar --numeric-owner -jxvf rootfs.tar.bz2
 \end{verbatim}
 
-Softlink \code{$(HOME)/rootfs} to this place and make sure you restart the NFS server.
+Softlink \code{${HOME}/rootfs} to this place and make sure you restart the NFS server.
 
 Copy the \code{zImage} and the device tree file to \code{/tftpboot}
 and boot using NFS.
