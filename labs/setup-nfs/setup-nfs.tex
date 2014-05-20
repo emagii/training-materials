@@ -16,8 +16,8 @@ directory will later be used to store the contents of our new
 root filesystem.
 
 \begin{verbatim}
-mkdir -p	$(HOME)/rootfs
-chmod 777	$(HOME)/rootfs
+mkdir -p	${HOME}/rootfs
+chmod 777	${HOME}/rootfs
 \end{verbatim}
 
 \section{Configure the NFS server}
@@ -57,7 +57,9 @@ sudo exportfs -av
 You can test your NFS setup by:
 
 \begin{verbatim}
-sudo mount -t nfs localhost:/home/ulf/rootfs
+cd
+mkdir nfstest
+sudo mount -t nfs localhost:/home/ulf/rootfs nfstest
 \end{verbatim}
 
 Replace \code{ulf} with your username.
