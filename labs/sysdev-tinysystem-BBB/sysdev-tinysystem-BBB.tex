@@ -1,4 +1,4 @@
-\subchapter{Tiny embedded system with BusyBox - Needs Fixing}{Objective: making a tiny yet full featured embedded system}
+\subchapter{Tiny embedded system with BusyBox}{Objective: making a tiny yet full featured embedded system}
 
 After this lab, you will:
 \begin{itemize}
@@ -135,15 +135,22 @@ If not,install the required packages:
 sudo apt-get install libglade2-dev libglib2.0-dev libgtk2.0-dev
 \end{verbatim}
 
-Unpack the busybox sources. Then initialize an empty git.
+\section{Unpacking and Patching the Busybox source code}
+
+You will build Busybox in several configurations, each in a separate subdirectory.
+Every time you build a new configuration, you need to unpack in the related subdirectory.
+
+Unpack the busybox sources. Then initialize an empty git inside the new directory.
 
 Apply the patches found in the \code{patches} subdirectory of {tinysystem}, in alphabetical order.
 
 Make sure that you do not have any modified or new files if you do \code{git status}.
 
-\section{Configuring Busybox}
+\section{Configuring Busybox with static libraries}
 
-Ensure that you have the toolchain set-up, and enter the Busybox source directory.
+Ensure that you have the toolchain set-up, and enter the \code{static} subdirectory.
+
+Unpack and patch the busybox source.
 
 You can get the default Busybox configuration (\code{.config}) by:
 
@@ -152,8 +159,8 @@ make defconfig
 \end{verbatim}
 
 This time, Busybox will be built using a predefined configuration file located in the 
-\code{data} directory. You should use \code{busybox-1.22.1.config.static}
-(remember that the Busybox configuration file is \code{.config} in the Busybox sources).
+\code{static} sub-directory. You should use \code{busybox-1.22.1.config}.
+Copy this file to the Busybox configuration file \code{.config} in the Busybox sources.
 
 If you don't use the BusyBox configuration file that we provide, at least,
 make sure you build BusyBox statically! Compiling Busybox
@@ -191,7 +198,11 @@ Exit the configuration, saving changes.
 
 Source the \code{toolchain.sh} script and start the build by typing \code{make}
 
-Once the build completes, you need to install the result in the \code{nfsroot} directory.
+\section{Installing Busybox}
+
+For this lab, we will create our NFS image in \code{tftpboot/busybox.static}
+
+Create the directory and make sure it can be NFS mounted.
 
 If you just type \code{make install} all files will be installed with You as the owner,
 but the proper owner for these files is \code{root}.
@@ -206,26 +217,76 @@ The proper way, is to enter superuser modes, setup the environment, and then ins
 \begin{verbatim}
 sudo su
 source toolchain.sh
-ln -s <your home>/rootfs _installreboot
+ln -s /tftpboot/busybox.static _install
 make install
 \end{verbatim}
 
-Verify that you have the right architecture, by entering the \code{${HOME}/rootfs/bin}
-directory and run readelf on \code{busybox}.
-
-Creqate an executable file and source it.
-
-\begin{verbatim}
-#!/bin/sh
-export SDK=/opt/poky/1.6/sysroots/x86_64-pokysdk-linux
-export GNUTOOLS=${SDK}/usr/bin/arm-poky-linux-gnueabi
-export PATH=${GNUTOOLS}:${PATH}
-export CROSS_COMPILE=arm-poky-linux-gnueabi-
-\end{verbatim}
-
-Then You can test by \code{arm-poky-linux-gnueabi-readelf -a busybox}
+Verify that you have the right architecture, by entering the \code{/tftpboot/busybox.static/bin}
+directory and run  \code{arm-poky-linux-gnueabi-readelf -a busybox}
 
 Also create a \code{dev} directory in \code{nfsroot} if it does not exist.
+
+Copy your kernel and device-tree file to \code{boot} directory of your filesystem.
+
+
+'sudo chmod -s busybox
+
+
+\clearpage
+\section{Setting up U-Boot for testing Busybox}
+
+Copy the \code{uSetup.txt} from the subdirectory to the SD-card.
+
+\begin{verbatim}
+ipaddr=192.168.0.100
+serverip=192.168.0.1
+loadaddr=0x80200000
+fdtaddr=0x88000000
+
+bootdir=/boot
+bootfile=zImage
+
+console=ttyO0,115200n8
+nfsopts=nolock
+optargs=video=HDMI-A-1
+
+setpath=setenv rootpath /tftpboot/${image}
+setup_ip=setenv ip ${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}::off
+
+tftp_kernel=run setpath ; tftp ${loadaddr} ${rootpath}/${bootdir}/${bootfile}
+tftp_dtb=run setpath    ; tftp ${fdtaddr}  ${rootpath}/${bootdir}/${fdtfile}
+
+mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} \
+  rootfstype=${mmcrootfstype} rootwait
+mmcrootfstype=squashfs
+nandboot=echo NAND boot disabled
+
+bootzImage=if test "${bootfile}" = "zImage"; then bootz ${loadaddr} - ${fdtaddr}; fi
+bootuImage=if test "${bootfile}" = "uImage"; then bootm ${loadaddr} - ${fdtaddr}; fi
+bootkernel=run bootzImage ; run bootuImage
+
+netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs \
+  nfsroot=${serverip}:/tftpboot/${image},${nfsopts} rw ip=${ipaddr}
+netargs=run setpath     ; run setup_ip ; setenv bootargs console=${console} \
+  ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=${ip}
+netboot=echo Booting from network ...; run findfdt; setenv autoload no; \
+  run tftp_kernel ; run tftp_dtb ; run netargs; bootm ${loadaddr} - ${fdtaddr}
+
+# image=core-image-minimal
+image=busybox.static
+br=setenv         image buildroot          ; setenv bootfile zImage ; run bootcmd
+dynamic=setenv    image busybox.dynamic    ; setenv bootfile zImage ; run bootcmd
+httpd=setenv      image busybox.httpd      ; setenv bootfile zImage ; run bootcmd
+static=setenv     image busybox.static     ; setenv bootfile zImage ; run bootcmd
+
+thirdparty=setenv image thirdparty         ; setenv bootfile zImage ; run bootcmd
+
+minimal=setenv    image core-image-minimal ; setenv bootfile uImage ; run bootcmd
+base=setenv       image core-image-base    ; setenv bootfile uImage ; run bootcmd
+cato=setenv       image core-image-cato    ; setenv bootfile uImage ; run bootcmd
+
+bootcmd=run findfdt ; run tftp_kernel tftp_dtb netargs bootkernel
+\end{verbatim}
 
 \section{Testing Busybox}
 
@@ -263,10 +324,13 @@ The first userspace program that gets executed by the kernel is
 In the BusyBox sources, read details about \code{/etc/inittab} in the
 \code{examples/inittab} file.
 
-Then, create a \code{/etc/inittab} file and a \code{/etc/init.d/rcS}
-startup script declared in \code{/etc/inittab}. In this startup
+Then, create a \code{/etc/inittab} file \footnote{Do not use getty as a shell, use /bin/sh}
+and a \code{/etc/init.d/rcS} startup script declared in \code{/etc/inittab}. In this startup
 script, mount the \code{/proc} and \code{/sys} filesystems.
+
+
 Reboot and check the contents. They should not be empty.
+
 
 Any issue after doing this?
 
@@ -311,24 +375,45 @@ target. Setup any needed links.
 ln -s libc-2.19.so libc.so.6
 \end{verbatim}
 
+If you get a permission denied error, you may have to set the execute bit
+of the libraries.
+
 Once the small test program works, we are going to recompile Busybox
 without the static compilation option, so that Busybox takes advantages of the
 shared libraries that are now present on the target.
 
 Before doing that, measure the size of the \code{busybox} executable.
 
-Rename the \code{${HOME}/rootfs} directory to  \code{${HOME}/rootfs.static}
-and create a new \code{${HOME}/rootfs}.
+\section{Configuring Busybox with shared libraries}
+
+Create the \code{/tftpboot/busybox.httpd} directory and export it via NFS.
 
 Restart the \code{nfs-kernel-server}, so NFS still works.
 
-Build Busybox with shared libraries, and install it on the target filesystem. 
-Use the \code{busybox-1.22.1.config.httpd} as your config.
+Go to the \code{httpd} subdirectory.
 
-Copy non busybox parts from the previous build.
+Use the \code{busybox-1.22.1.config} in \code{httpd} as your config.
+
+Build Busybox with shared libraries, and install it on the target filesystem. 
+
+Copy non busybox parts from the previous build. Dont forget the kernel files.
+
+Create the \code{dynamic} textfile in the toplevel.
+
+Time to boot the system. How can you make sure that 
+you are booting from the right NFS export.
+
+What options do you have?
 
 Make sure that the system still boots and see
 how much smaller the \code{busybox} executable got.
+
+
+\begin{verbatim}
+ls -l /
+\end{verbatim}
+
+You should see the \code{dynamic} file.
 
 \section{Implement a web interface for your device}
 
@@ -336,7 +421,7 @@ Replicate \code{data/www/} to the \code{/www} directory in your target root file
 
 Now, run the BusyBox http server from the target command line:
 
-\begin{verbatim}/
+\begin{verbatim}
 /usr/sbin/httpd -h /www/
 \end{verbatim}
 

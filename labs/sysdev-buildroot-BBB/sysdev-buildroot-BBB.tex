@@ -58,6 +58,7 @@ download directory \code{${TOPDIR}/dl} to your download directory.
 ln -s ../download dl
 \end{verbatim}
 
+\clearpage
 
 \section{Configure Buildroot}
 
@@ -91,6 +92,7 @@ Set the following options:
   \item enable \code{Toolchain has large file support?}, 
   \item enable \code{Toolchain has RPC support?}
   \item enable \code{WCHAR support?}
+  \item enable \code{Thread Library Debugging}
   \item enable \code{Toolchain has C++ support?}.
   \item enable \code{Build cross-gdb for the host}.
   \end{itemize}
@@ -98,10 +100,26 @@ Set the following options:
   \begin{itemize}
   \item Keep \code{BusyBox} (default version) and keep the Busybox
     configuration proposed by Buildroot;
+  \item in \code{libraries->networking}
+  \begin{itemize}
+  \item Select \code{libcurl} and \code{curl} binary
+  \end{itemize}
+  \item in \code{libraries->others}
+  \begin{itemize}
+  \item Select \code{boost} (Enable all options)
+  \end{itemize}
+  \end{itemize}
+\item \code{Target Packages}
+  \begin{itemize}
+  \item Select \code{Debugging, profiling and benchmark}
+  \begin{itemize}
+  \item Select \code{gdb->gdbserver}
+  \item Select \code{strace}
+  \end{itemize}
   \end{itemize}
 \item \code{Filesystem images}
   \begin{itemize}
-  \item Select \code{ext2/3/4 root filesystem}
+  \item Select \code{ext4 root filesystem}
   \item Select \code{tar the root filesystem with bzip2}
   \end{itemize}
 \end{itemize}
@@ -109,7 +127,7 @@ Set the following options:
 Exit the menuconfig interface. Your configuration has now been saved
 to the \code{.config} file.
 
-
+\clearpage
 \section{Generate the embedded Linux system}
 
 Just run:
@@ -164,16 +182,24 @@ explore its contents:
 
 \section{Run the generated system}
 
-Create a directory where you extract the tarball.
+Create a directory \code{/tftpboot/buildroot}, where you extract the tarball.
 
 \begin{verbatim}
+mkdir -p /tftpboot/buildroot
+cd       /tftpboot/buildroot
 sudo tar --numeric-owner -jxvf rootfs.tar.bz2
 \end{verbatim}
 
+Make sure the filesystem is exported through NFS, including restarting the NFS server.
+
+Update the \code{uSetup.txt} file on your SD-Card to allow boot from buildroot
+
 Softlink \code{${HOME}/rootfs} to this place and make sure you restart the NFS server.
 
-Copy the \code{zImage} and the device tree file to \code{/tftpboot}
-and boot using NFS.
+Copy the \code{zImage} and the device tree file to \code{/tftpboot/buildroot/boot}
+directory.
+
+Boot using NFS.
 
 Use the \code{root} username, no password is required.
 
