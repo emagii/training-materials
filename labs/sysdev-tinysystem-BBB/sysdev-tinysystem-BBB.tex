@@ -265,8 +265,6 @@ bootzImage=if test "${bootfile}" = "zImage"; then bootz ${loadaddr} - ${fdtaddr}
 bootuImage=if test "${bootfile}" = "uImage"; then bootm ${loadaddr} - ${fdtaddr}; fi
 bootkernel=run bootzImage ; run bootuImage
 
-netargs=setenv bootargs console=${console} ${optargs} root=/dev/nfs \
-  nfsroot=${serverip}:/tftpboot/${image},${nfsopts} rw ip=${ipaddr}
 netargs=run setpath     ; run setup_ip ; setenv bootargs console=${console} \
   ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=${ip}
 netboot=echo Booting from network ...; run findfdt; setenv autoload no; \
