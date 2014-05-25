@@ -19,15 +19,13 @@ this MMC card, without using NFS anymore.
 \section{Setup}
 
 Throughout this lab, we will continue to use the root filesystem we
-have created in the \nfsroot directory, which we will progressively adapt to use block filesystems.
+have created in the \nfsroot2 directory, which we will progressively adapt to use block filesystems.
 
 \section{Filesystem support in the kernel}
 
-Your kernel should already be compiled with support for SquashFS and ext3.
-If not, reconfigure the kernel and recompile.
-
-You need to copy the new kernel to \code{/tftpboot} and reinstall 
-the modules into \nfsroot.
+Your kernel should already be compiled with support for SquashFS and ext3/4.
+If not, reconfigure the kernel and recompile and copy to the \code{boot}
+directory of \nfsroot2. Also install the kernel modules.
 
 Boot your board with this new kernel and on the NFS filesystem you
 used in this previous lab.\footnote{If you didn't do or complete the
@@ -39,25 +37,22 @@ If you followed the setup of the SD-Card, it should be ready for use.
 Otherwise go back and setup the SD-card.
 
 Using \code{cfdisk}
-\footnote{When you have initialized a partition and want to add more, you don't have to specify headers and sectors again. Just run \code{cfdisk /dev/sdx}}.
+\footnote{When you have initialized a partition and want to add more, you don't have to specify headers and sectors again. Just run \code{cfdisk /dev/sdx}} (or \code{cfdisk /dev/mmcblk0x}).
 
 \clearpage
 On top of the boot partition, we will need:
 
 \begin{itemize}
 
-\item One partition, 8 MB big (We created a much larger one)
-  \footnote{For the needs of our system, the partition could even be
-  much smaller, and 1 MB would be enough. However, with the 8 GB SD
-  cards that we use in our labs, 8 MB will be the smallest partition
-  that \code{cfdisk} will allow you to create.},
-  that will be used for the root filesystem. Due to the geometry of the device,
-  the partition might be larger than 8 MB, but it does not matter. 
+\item One partition that will be used for the root filesystem. 
+  Due to the geometry of the device, the minimum partition size must be larger than 8 MB,
+  but  if we add kernel modules, the size will be much larger.
+  We will use 2048 MB.
   Keep the \code{Linux} type for the partition.
 
-\item One partition, that fills the rest of the MMC card, that will be
-  used for the data filesystem. Here also, keep the \code{Linux} type
-  for the partition.
+\item One partition, that will be used for the data filesystem. 
+  Here also, keep the \code{Linux} type for the partition.
+  This should be 512 MB.
 
 \end{itemize}
 
@@ -126,12 +121,12 @@ In order to create SquashFS images on your host, you need to install
 the \code{squashfs-tools} package. They should normally be installed.
 Now create a SquashFS image of your NFS root directory.
 
-Before creating the filesystem, you should create \code{${HOME}/rootfs/boot},
-and copy the kernel and device tree file to this directory.
+Before creating the filesystem, you should create the \code{boot} directory,
+in \nfsroot2 and copy the kernel and device tree file to this directory.
 
 \begin{verbatim}
-cd
-mksquashfs -all-root -noappend rootfs rootfs.sqfs
+cd /tftpboot
+mksquashfs -all-root -noappend busybox.httpd rootfs.sqfs
 \end{verbatim}
 
 Finally, using the \code{dd} command, copy the file system image to
@@ -147,7 +142,9 @@ sudo dd if=rootfs.sqfs of=/dev/sdb2
 
 In the U-boot shell, configure the kernel command line to use the
 second partition of the MMC disk (\code{/dev/mmcblk0p2}) as the 
-root file system. 
+root file system. (YOU can also modify the \code{uSetup.txt} file.
+
+Remeber that there is a predefined environment which you can use.
 
 Also add the \code{rootwait} boot argument, to wait for the MMC disk to be properly
 initialized before trying to mount the root filesystem. Since the MMC
@@ -158,10 +155,12 @@ Check that your system still works. Congratulations if it does!
 
 \section{Store the kernel image and DTB on the MMC card}
 
-Finally, copy the \code{uImage} kernel image and DTB to the first partition of
-the MMC card (the partition called \code{boot}), and edit the \code{uSetup.txt}
+Finally, copy the \code{zImage} kernel image and DTB to the SD-Card.
+What is the easiset?
+You can put it in the first partition of the SD card (the partition called \code{boot}),
+or you can keep it in the root filesystem. Edit the \code{uSetup.txt}
 to adjust the \code{bootcmd} of U-Boot so that it loads the kernel and DTB from the 
-MMC card instead of loading them through the network.
+SD card instead of loading them through the network.
 
 \section{Booting the easy way}
 
