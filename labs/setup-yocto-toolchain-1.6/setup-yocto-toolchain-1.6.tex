@@ -232,6 +232,20 @@ Now you can use the cross compiler by just sourcing this file.
 source toolchain.sh
 \end{verbatim}
 
+\section{Simplifying access to the toolchain script}
+
+For easier to access the toolchain script,
+you may want to create the \code{~/bin} directory,
+and copy the script here.
+
+Add 
+
+\begin{verbatim}
+PATH=~/bin:$PATH
+\end{verbatim}
+
+to the end of \code{~/.bashrc}
+
 \section{Using the cross-compiler and sudo}
 
 Sometimes, the documentation may ask you do to:
