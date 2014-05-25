@@ -231,20 +231,200 @@ make a mistake that causes you to loose your \code{MLO} and
 
 \clearpage
 
+\section{The U-Boot boot process}
+
+When U-Boot starts, it loads the environment from a non-volatile memory to RAM
+The environment is a set of variables, which can be used as scripts through the \code{run}
+command. Other environment variables are used to define constants like addresses,
+for use in script variables
+
+The location of the environment memory is defined in a compile time constant,
+typically set in \code{board.cfg}.
+Examples of environment memory types are NOR Flash, NAND Flash, SPI Flash and I2C EEPROM.
+
+The first time U-Boot is started on a board, it will load a default environment.
+
+You can modify a variable or create a new one with the \code{setenv} command.
+
+If you have an environment memory, you can save the updated environment with the \code{saveenv} command.
+
+The next time, U-boot is started, it will detect that you have a valid environment,
+and load this, instead of the default environment.
+
+Not every board has an environment memory, and an example of the this is the \devboard.
+Such board will always load the default memory at start-up. 
+
+The U-Boot process depends on two special variables \code{bootcmd} and \code{bootargs}.
+
+If the user does not intervene, by pressing \code{<return>}, U-Boot will \code{run}
+the \code{bootcmd} variable script.  Typically the last command executed in \code{bootcmd}
+is a command which boots the linux kernel.  There are several commands available.
+
+\begin{itemize} 
+
+\item \code{bootm} Boots a \code{uImage}
+
+\item \code{bootz} Boots a \code{zImage}
+
+\end{itemize}
+
+When any of the boot commands are executed, they will boot the kernel and pass
+the contents of the \code{bootargs} variable to the kernel.
+
+The way to use the U-Boot environment has been refined over time. In early days,
+you would typically set the \code{bootargs} directly. The current approach is
+to run a variable script which generates \code{bootargs} from a set of other variables.
+
+More information about U-Boot is available in \code{http://www.denx.de/wiki/DULG/Manual}
+
+The \devboard predefined environment is set-up to boot from an SD-Card.
+
+The \devboard \code{bootcmd} is fairly complex, and tries to detect an external SD-Card.
+If not present, it will use the soldered SD-Card.
+Once the card is selected, U-Boot will try to load the file \code{uEnv.txt}
+and import the contents into the environment.
+
+The syntax for setting variables in \code{uEnv.txt} are
+
+\begin{verbatim}
+<VARIABLE>=<VALUE>
+\end{verbatim}
+
+An Example:
+
+\begin{verbatim}
+uenvcmd=run tftp_kernel tftp_dtb netargs bootkernel
+\end{verbatim}
+
+This creates the variable script \code{uenvcmd} to run four scripts in succession.
+
+The variable \code{uenvcmd} has a special meaning in the \devboard U-Boot.
+Once the \code{uEnv.txt} has been imported, \code{bootcmd} will test
+for the precense of this variable, and if it exists, it will be \code{run}.
+
+By setting this to a suitable value, you can boot from any source.
+
+If \code{uenvcmd} is not defined in \code{uEnv.txt}, 
+U-Boot will try to load the kernel and device-tree file
+from the second partition of the SD-Card which
+normally should contain the file system.
+The default assumes that they are located in the \code{/boot} directory.
+
+It will set-up the \code{bootargs} variable to use the second partition
+of the SD-Card as its root and then boot the kernel.
+
+There is a small problem with this approach, and that it does 
+not give the user any flexibility. If the boot is stopped before
+\code{bootcmd} is executed, only the default environment is available.
+
+If \code{bootcmd} is executed, it cannot easily be stopped, so while
+U-Boot can be booted from any source, it boot sequence cannot be changed
+without modifying the \code{uEnv.txt} file.
+
+The patched U-Boot used in this lab, supports an alternative method.
+
+\section{The U-Boot modified boot process}
+
+After U-Boot has loaded the default environment, it will load the \code{uSetup.txt}
+file from the seclected SD-Card and import its content into the environment. It has the same syntax as the \code{uEnv.txt} file.
+This happens before U-Boot checks if the user wants to abort the automatic boot,
+by pressing \code{<return>} key.
+
+If the user does not abort, the \code{bootcmd} command will be executed.
+
+By changing the \code{bootcmd} command in \code{uSetup.txt}, you can make U-Boot
+boot from any source.
+
+If the user aborts the automatic boot, and enters the U-Boot command loop,
+\code{uSetup.txt} can have created scripts, that can be run manually,
+to allow easy selection of the boot sequence.
+
 \section{Preparing an SD-card with U-Boot}
-You can now copy the generated \code{MLO} and \code{u-boot.img} files
+
+Copy the generated \code{MLO} and \code{u-boot.img} files
 to the SD card FAT partition. \code{MLO} is the first stage bootloader,
 \code{u-boot.img} is the second stage bootloader.
 
-Normally, \code{u-boot} executed the \code{bootcmd} which reads the
-\code{uEnv.txt} which modifies the boot. The problem with this approach, is
-that you cannot stop the boot.
+\clearpage
 
-Our patch (which is not standard) will start by reading the \code{uSetup.txt}
+\section{Preparing an SD-card with U-Boot using uEnv.txt}
+
+We will create a new \code{uEnv.txt} on the host using the template below.
+
+Change values to fit your setup:
+
+You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
+
+Modify the \code{$HOME} variable to your own HOME directory.
+
+For technical reasons, long lines are split up in this pdf file, 
+using the {\bf \code{'\'}} character.
+In the \code{uEnv.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+
+\begin{verbatim}
+tftp_dtb=tftp ${fdtaddr} \
+  am335x-boneblack.dtb
+\end{verbatim}
+
+becomes
+
+\begin{verbatim}
+tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
+\end{verbatim}
+
+in the file.
+
+{\bf The assignment of 'netargs' should each be a single line.}
+
+In \code{ttyO2}, it's the capital letter \code{O}, like in {\bf O}MAP and not the number zero)
+
+\begin{verbatim}
+serverip=192.168.0.1
+ipaddr=192.168.0.100
+loadaddr=0x80200000
+fdtaddr=0x80F80000
+HOME=/home/ulf
+console=ttyO0,115200n8
+nfsopts=nolock
+netargs=setenv bootargs console=${console} root=/dev/nfs \
+  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+tftp_kernel=tftp ${loadaddr} zImage
+tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
+bootkernel=bootz ${loadaddr} - ${fdtaddr}
+uenvcmd=run tftp_kernel tftp_dtb netargs bootkernel
+mmcboot=echo MMC boot disabled
+nandboot=echo NAND boot disabled
+\end{verbatim}
+
+Copy the file to the FAT partition.
+
+Create an empty file \code{uSetup.txt} in the same place. 
+
+Remember to run \code{sudo sync} before unmounting and removing the card.
+
+\clearpage
+\section{Preparing an SD-card with U-Boot using uSetup.txt}
+
+Our U-Boot patch (which is not standard) will start by reading the \code{uSetup.txt}
 before \code{bootcmd} is executed, so you have a chance to stop the boot,
 by pressing{\bf return}.
 
-You should create the file \code{uSetup.txt} looking like:
+Below is a template for the file \code{uSetup.txt}, but it needs to be edited
+before it can be used. 
+
+Create a \code{uSetup.txt} file on your host.
+
+You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
+
+Modify the \code{$HOME} variable to your own HOME directory.
+
+For technical reasons, long lines are split up in this pdf file, 
+using the {\bf \code{'\'}} character.
+In the \code{uSetup.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+
+{\bf The assignments of 'netargs' and 'mmcargs' should each be a single line.}
+
+In \code{ttyO2}, it's the capital letter \code{O}, like in {\bf O}MAP and not the number zero)
 
 \begin{verbatim}
 ipaddr=192.168.0.100
@@ -255,35 +435,19 @@ HOME=/home/ulf
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-	nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}
-bootcmd=run tftp_kernel tftp_dtb netargs bootkernel
 mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} \
-	rootfstype=${mmcrootfstype} rootwait
+  rootfstype=${mmcrootfstype} rootwait
 mmcrootfstype=squashfs
 nandboot=echo NAND boot disabled
+bootcmd=run tftp_kernel tftp_dtb netargs bootkernel
 \end{verbatim}
 
-(Caution: in \code{ttyO2} above, it's the capital letter \code{O}, like in
-{\bf O}MAP and not the number zero)
-
-{\bf Note that the 'netargs' and 'mmcargs' lines should be a single line.}
-
-You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
-
-You should also use your own {\bf \code{$HOME}}.
-
-Copy \code{uSetup.txt} it to the FAT partition and also create an empty \code{uEnv.txt} in the same place.
-
-Run \code{sudo sync} to make sure it is properly copied
-
-Unmount the SD card partition (Choose the disk where the SD-card is mounted).
-
-\begin{verbatim}
-sudo umount /dev/sd<n>
-\end{verbatim}
+Do not copy \code{uSetup.txt} to the SD-Card yet, instead keep the empty 
+\code{uSetup.txt} in the FAT partition.
 
 \clearpage
 
@@ -345,10 +509,9 @@ When U-Boot initializes, it will execute the contents of the \code{bootcmd} vari
 Before that happens, it will wait for a few seconds (value of \code{bootdelay}) giving
 the user a chance to stop the boot. 
 
-www.kwewww.kernel.Press the \code{<return>} button before the counter expires, to enter the U-Boot shell.
+Press the \code{<return>} button before the counter expires, to enter the U-Boot shell.
 
- (You may have to reset the Beaglebone if you
-did not manage to press the \code{<return>} button in time)
+(You may have to reset the Beaglebone if you did not manage to press the \code{<return>} button in time)
 \begin{verbatim}
 U-Boot #
 \end{verbatim}
@@ -359,7 +522,7 @@ You can get more help on a specific command. Try \code{help boot}.
 
 \clearpage
 
-\section{U-Boot Environment}
+\section{The Default U-Boot Environment}
 U-Boot supports an environment, and you can extend the commandset by defining environment variables.
 These can be "used" as scripts through the \code{run} command 
 It is possible to define a compile time environment, which can be extended at run time.
@@ -367,7 +530,7 @@ On the Beaglebone Black, the environment can be updated from the file uEnv.txt s
 together with \code{MLO} and \code{u-boot.img} on the SD-Card.
 
 All environment variables are normally displayed in alphabetical order, when printed.
-To make it easier to understand, they are displayed below in an easier format below.
+To make it easier to understand, they are displayed sorted a little more logical below.
 
 \begin{lstlisting}
 arch=arm
@@ -600,8 +763,10 @@ spiboot=
 \clearpage
 \section{Setting up the \devboard Networking in U-Boot}
 
-If you created the \code{uEnv.txt} according to the lab instructions, 
-this will set the \code{serverip} variable. Try:
+The networking commands in U-Boot typically needs to have \code{ipaddr} and 
+\code{serverip} configured. The \code{uEnv.txt} we use, sets up these values.
+
+Try:
 
 \begin{verbatim}
 print serverip
@@ -613,7 +778,7 @@ You will get an error message.
 ## Error: "serverip" not defined  
 \end{verbatim}
 
-The reason is that \code{uEnv.txt} is read when the \code{bootcmd} variable is run.
+The reason is that \code{uEnv.txt} is only read when the \code{bootcmd} variable is run.
 
 Since you stopped U-Boot by pressing {\bf return}, bootcmd did not run,
 and therefore \code{uEnv.txt} was not read and added to the environment.
@@ -644,12 +809,6 @@ print ipaddr
 print ethaddr
 \end{verbatim}
 
-If \code{ipaddr} is not set, or not reasonable, set it manually
-
-\begin{verbatim}
-setenv ipaddr 192.168.0.100
-\end{verbatim}
-
 If the MAC address is not set, you also need to set it in U-boot,
 If this is the case, please contact the teacher and you will be allocated
 a number XX. \footnote{The \devboard contains an EEPROM which is programmed with the MAC address
@@ -659,10 +818,15 @@ a number XX. \footnote{The \devboard contains an EEPROM which is programmed with
 setenv ethaddr 01:02:03:04:05:XX
 \end{verbatim}
 
-If you changed \code{ethaddr}, switch your board off and on again\footnote{Power cycling your
-  board is needed to make your \code{ethaddr} permanent, for obscure
+If you changed \code{ethaddr}, switch your board off and on again and let it run bootcmd.\footnote{Power cycling your board is needed to make your \code{ethaddr} permanent, for obscure
   reasons. If you don't, U-boot will complain that \code{ethaddr} is not
   set.}. Don't forget to press the {\bf user} button.
+
+If \code{ipaddr} is not set, or not reasonable, set it manually
+
+\begin{verbatim}
+setenv ipaddr 192.168.0.100
+\end{verbatim}
 
 In case the board was previously configured in a different way, we
 also turn off automatic booting after commands that can be used to
@@ -723,6 +887,9 @@ sudo /etc/init.d/xinetd restart
 
 depending on which tftpd server you use.
 
+You may in severe cases, need to reboot your host.
+If you still fail, please recheck your configuration.
+
 The \code{tftp} command should have downloaded
 the \code{textfile.txt} file from your development
 workstation into the board's memory at location 0x80000000 (this
@@ -732,6 +899,37 @@ was successful by dumping the contents of the memory:
 \begin{verbatim}
 md 0x80000000
 \end{verbatim}
+
+\clearpage
+\section{Testing booting with environment in uSetup.txt}
+
+Replace the empty \code{uSetup.txt} file you previously created in the FAT partition
+with the one you created on the host.  \code{sync}, unmount, and reinsert into the
+\devboard.
+
+reset, (again check the date of the U-Boot) and stop the autoboot using \code{<return>}.
+
+Again test the networking environment by checking the value of \code{ipaddr} and \code{serverip}
+
+They should now be set.
+
+We also want to verify that you have not done some common mistakes.
+
+\begin{verbatim}
+print HOME
+\end{verbatim}
+
+This should show {\bf Your} HOME directory, and not \code{/home/ulf}
+
+\begin{verbatim}
+run netargs
+print bootargs
+\end{verbatim}
+
+If \code{bootargs} has the value \code{console=${console} root=/dev/nfs} and nothing
+more, then you have not merged the line assigning the value to netargs with the next line.
+
+Please edit \code{uSetup.txt} and fix the problems.
 
 \clearpage
 \section{Reflashing from U-boot (Skip)}
