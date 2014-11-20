@@ -15,7 +15,7 @@ build ()
 
 get ()
 {
-	sudo apt-get install $1
+	sudo apt-get -y install $1
 }
 # ====================================
 
@@ -32,15 +32,18 @@ prepare_machine ()
 	sudo	easy_install	Pygments
 }
 
-get_materials ()
+get_fe_materials ()
 {
 	top
-	git clone   git://git.free-electrons.com/training-materials.git
+	git clone   git://git.free-electrons.com/training-materials.git	fe-training-materials
 	git clone   git://git.free-electrons.com/training-scripts.git
+}
+
+configure ()
+{
 	build
 	git am ../0001-beagleboneblack-Use-correct-path-to-picture.patch
 }
-
 
 make_presentation ()
 {
@@ -62,5 +65,6 @@ build_presentations ()
 
 prepare_machine
 get_materials
+configure
 build_presentations
 
