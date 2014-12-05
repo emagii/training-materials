@@ -4,7 +4,9 @@ UBUNTU_LABS   = setup-ubuntu \
 		setup-samba \
 		setup-serial \
 		sysdev-SD-card \
+		setup-tftpd-generic \
 		setup-tftpd \
+		setup-tftpd-hpa \
 		setup-usbnet-startech \
 		setup-nfs \
 		setup-yocto-toolchain-1.6 \

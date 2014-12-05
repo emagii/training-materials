@@ -54,6 +54,7 @@ make_presentation ()
 build_presentations ()
 {
 	build
+	export VENDOR=eMagii
 	make_presentation full-sysdev-labs	 #	Complete labs for the 'sysdev' course
 	make_presentation full-kernel-labs       #	Complete labs for the 'kernel' course
 	make_presentation full-android-labs      #	Complete labs for the 'android' course

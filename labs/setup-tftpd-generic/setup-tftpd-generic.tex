@@ -1,0 +1,19 @@
+\subchapter{Setting up a TFTP Server}{Objectives:
+Set up TFTP communication with the development workstation.}
+
+\section{Install the TFTPD server}
+
+In the following sections you will get instructions on how to
+setup the \code{tftpd} and \code{tftpd-hpa} servers.
+
+Only one of them can be active in a system.
+
+If you have \code{xinetd} present in the system, use \code{tftpd}.
+
+(Check if \code{/etc/xinetd.d} exists)
+
+If it does not exist, install \code{tftpd-hpa}
+
+You should also make sure that the corresponding \code{tftp} client
+is available. Check with \code{synaptic} that it is installed.
+

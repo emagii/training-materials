@@ -355,18 +355,19 @@ Change values to fit your setup:
 
 You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
 
-Modify the \code{$HOME} variable to your own HOME directory.
-
-For technical reasons, long lines are split up in this pdf file, 
-using the {\bf \code{'\'}} character.
-In the \code{uEnv.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution:  For technical reasons, long lines are split up in this pdf file, 
+using the {\bf \code{'\'}} character. In the \code{uEnv.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+}
+\end{minipage}}
 
 \begin{verbatim}
 tftp_dtb=tftp ${fdtaddr} \
   am335x-boneblack.dtb
 \end{verbatim}
 
-becomes
+should look like
 
 \begin{verbatim}
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
@@ -374,20 +375,23 @@ tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 
 in the file.
 
-{\bf The assignment of 'netargs' should each be a single line.}
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Variables using split lines like this are 'netargs'
+}
+\end{minipage}}
 
-In \code{ttyO2}, it's the capital letter \code{O}, like in {\bf O}MAP and not the number zero)
 
 \begin{verbatim}
-serverip=192.168.0.1
 ipaddr=192.168.0.100
+serverip=192.168.0.1
 loadaddr=0x80200000
 fdtaddr=0x80F80000
-HOME=/home/ulf
+IMAGE=rootfs
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+  nfsroot=${serverip}:/tftpboot/${IMAGE},${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}
@@ -395,6 +399,12 @@ uenvcmd=run tftp_kernel tftp_dtb netargs bootkernel
 mmcboot=echo MMC boot disabled
 nandboot=echo NAND boot disabled
 \end{verbatim}
+
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: In \code{ttyO2}, it's the capital letter \code{O}, like in {\bf O}MAP and not the number zero)
+}
+\end{minipage}}
 
 Copy the file to the FAT partition.
 
@@ -407,7 +417,7 @@ Remember to run \code{sudo sync} before unmounting and removing the card.
 
 Our U-Boot patch (which is not standard) will start by reading the \code{uSetup.txt}
 before \code{bootcmd} is executed, so you have a chance to stop the boot,
-by pressing{\bf return}.
+by pressing {\bf return}.
 
 Below is a template for the file \code{uSetup.txt}, but it needs to be edited
 before it can be used. 
@@ -416,11 +426,12 @@ Create a \code{uSetup.txt} file on your host.
 
 You should use the same values for {\bf ipaddr} and {\bf serverip} as used in the toplevel \code{host.mk} file.
 
-Modify the \code{$HOME} variable to your own HOME directory.
-
-For technical reasons, long lines are split up in this pdf file, 
-using the {\bf \code{'\'}} character.
-In the \code{uSetup.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution:  For technical reasons, long lines are split up in this pdf file, 
+using the {\bf \code{'\'}} character. In the \code{uEnv.txt} file, they must be a single line with the {\bf \code{'\'}} character removed.
+}
+\end{minipage}}
 
 {\bf The assignments of 'netargs' and 'mmcargs' should each be a single line.}
 
@@ -431,11 +442,11 @@ ipaddr=192.168.0.100
 serverip=192.168.0.1
 loadaddr=0x80200000
 fdtaddr=0x80F80000
-HOME=/home/ulf
+IMAGE=rootfs
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+  nfsroot=${serverip}:/tftpboot/${IMAGE},${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}
@@ -864,16 +875,21 @@ uEnv.txt:
 \section{Testing the customized U-Boot environment}
 
 You can then test the TFTP connection. First, put a small text file called
-\code{textfile.txt} in the directory exported through TFTP on your development
-workstation (Normally \code{/tftpboot}). Then, from U-Boot, do:
+\code{testfile.txt} in the directory exported through TFTP on your development
+workstation (Normally \code{/tftpboot}, and you may already have the file there).Then, from U-Boot, do:
 
 \begin{verbatim}
-tftp 0x80000000 textfile.txt
+tftp 0x80000000 testfile.txt
 \end{verbatim}
 
-{\bf Caution: known issue in Ubuntu 12.04 and later}:
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: known issue in Ubuntu 12.04 and later:
 if this command doesn't work, you may have to stop the server
-and start it again every time you boot your workstation:
+and start it again every time you boot your workstation
+}
+\end{minipage}}
+
 
 \begin{verbatim}
 sudo service tftpd-hpa restart
@@ -891,7 +907,7 @@ You may in severe cases, need to reboot your host.
 If you still fail, please recheck your configuration.
 
 The \code{tftp} command should have downloaded
-the \code{textfile.txt} file from your development
+the \code{testfile.txt} file from your development
 workstation into the board's memory at location 0x80000000 (this
 location is part of the board DRAM). You can verify that the download
 was successful by dumping the contents of the memory:
@@ -913,18 +929,15 @@ Again test the networking environment by checking the value of \code{ipaddr} and
 
 They should now be set.
 
-We also want to verify that you have not done some common mistakes.
+Test one of our new commands.
 
 \begin{verbatim}
-print HOME
-\end{verbatim}
-
-This should show {\bf Your} HOME directory, and not \code{/home/ulf}
-
-\begin{verbatim}
+print bootargs
 run netargs
 print bootargs
 \end{verbatim}
+
+The netargs script have update the \code{bootargs} variable.
 
 If \code{bootargs} has the value \code{console=${console} root=/dev/nfs} and nothing
 more, then you have not merged the line assigning the value to netargs with the next line.

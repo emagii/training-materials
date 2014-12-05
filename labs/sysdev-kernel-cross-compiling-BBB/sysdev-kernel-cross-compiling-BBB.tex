@@ -59,8 +59,12 @@ Another reason is that \code{PKG_CONFIG_PATH} is not set up.
 export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
 \end{verbatim}
 
-The \code{toolchain.sh} file changes some critical things, which breaks
-the kernel configuration make targets.
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: The \code{toolchain.sh} file changes some critical things, which breaks
+the kernel configuration make targets. You may be able to 'make xconfig' by using a eparate terminal where you did not source 'toolchain.sh'.
+}
+\end{minipage}}
 
 If you have sourced the file, qt development libraries will not be found.
 
@@ -150,16 +154,16 @@ The kernel support dynamically loaded modules, which needs to be built separatel
 make modules
 \end{verbatim}
 
-Install the modules in the \code{${HOME}/rootfs} directory.
+Install the modules in the \code{/tftpboot/rootfs} directory.
 We will not use them right now, but we will need them later.
  
 \begin{verbatim}
-make INSTALL_MOD_PATH=${HOME}/rootfs modules_install
+make INSTALL_MOD_PATH=/tftpboot/rootfs modules_install
 \end{verbatim}
 
-Check the contents of the \code{${HOME}/rootfs} directory. There should be a \code{lib} directory.
+Check the contents of the \code{/tftpboot/rootfs} directory. There should be a \code{lib} directory.
 
-Copy the \code{zImage} and DTB files to the directory exposed by the TFTP server.
+Copy the \code{zImage} and DTB files to the /tftpboot directory exposed by the TFTP server.
 
 \section{Setting up serial communication with the board}
 
@@ -266,34 +270,23 @@ We will handle this in forthcoming labs.
 You can automate all this every time the board is booted or reset. 
 
 U-Boot contains a precompiled environment, which will attempt to load
-the kernel from an 
-
-
-
-When you compile  U-Boot for the Beaglebone, hs
-
-
-
+the kernel from an SD-Card.
 
 Remove the micro-SD card and connect it to your host.
 
-We will now change your \code{uEnv.txt}.
+Verify the \code{uEnv.txt}.
 
-The only thing that needs to change, is to change
-the assignment to \code{bootcmd} to \code{uenvcmd}.
-
-Change the values below to fit your setup:
 
 \begin{verbatim}
-serverip=192.168.0.1
 ipaddr=192.168.0.100
+serverip=192.168.0.1
 loadaddr=0x80200000
 fdtaddr=0x80F80000
-HOME=/home/ulf
+IMAGE=rootfs
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+  nfsroot=${serverip}:/tftpboot/${IMAGE},${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}

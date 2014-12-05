@@ -1,6 +1,12 @@
 \subchapter{Setting up the TFTPD-HPA server}{Objectives:
 Set up TFTP communication with the development workstation.}
 
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: You only need to do this if \code{tftpd} fails.
+}
+\end{minipage}}
+
 \section{Install the TFTPD-HPA server}
 
 Later on, we will transfer files from the development workstation to
@@ -43,8 +49,8 @@ sudo    chmod -R 777    /tftpboot
 Restart tftpd by:
 
 \begin{verbatim}
-service tftpd-hpa restart
-service tftpd-hpa status
+sudo service tftpd-hpa restart
+sudo service tftpd-hpa status
 \end{verbatim}
 
 \clearpage
@@ -57,11 +63,13 @@ cd	/tftpboot
 echo	111	> testfile.txt
 \end{verbatim}
 
+Check which IP address you have using \code{ifconfig}
+
 Start tftp and get the file
 
 \begin{verbatim}
 cd
-tftp	localhost
+sudo tftp	<xx.xx.xx.xx>
 
 tftp> get testfile.txt
 Sent 5 bytes in 0.0 seconds
@@ -72,4 +80,9 @@ cat testfile.txt
 
 \end{verbatim}
 
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: Note that tftp localhost seems not to work
+}
+\end{minipage}}
 

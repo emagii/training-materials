@@ -65,11 +65,11 @@ ipaddr=192.168.0.100
 serverip=192.168.0.1
 loadaddr=0x80200000
 fdtaddr=0x80F80000
-HOME=/home/ulf
+IMAGE=rootfs
 console=ttyO0,115200n8
 nfsopts=nolock
 netargs=setenv bootargs console=${console} root=/dev/nfs \
-  nfsroot=${serverip}:${HOME}/rootfs,${nfsopts} rw ip=${ipaddr}
+  nfsroot=${serverip}:/tftpboot/${IMAGE},${nfsopts} rw ip=${ipaddr}
 tftp_kernel=tftp ${loadaddr} zImage
 tftp_dtb=tftp ${fdtaddr} am335x-boneblack.dtb
 bootkernel=bootz ${loadaddr} - ${fdtaddr}
@@ -78,7 +78,7 @@ mmcboot=echo MMC boot disabled
 nandboot=echo NAND boot disabled
 \end{verbatim}
 
-Of course, you need to adapt the IP addresses and HOME to your exact network
+Of course, you need to adapt the IP addresses to your exact network
 setup.
 
 You will later need to make changes to the \code{bootargs} value.
@@ -138,13 +138,16 @@ sudo apt-get install libglade2-dev libglib2.0-dev libgtk2.0-dev
 \section{Unpacking and Patching the Busybox source code}
 
 You will build Busybox in several configurations, each in a separate subdirectory.
-Every time you build a new configuration, you need to unpack in the related subdirectory.
+Everytime you build a new configuration, you need to follow this procedure.
 
-Unpack the busybox sources. Then initialize an empty git inside the new directory.
+\begin{itemize}
+\item Go to the subdirectory.
+\item Unpack the busybox sources
+\item Initialize an empty git inside the busybox source directory.
+\item Apply the patches found in the \code{patches} subdirectory of {tinysystem}, in alphabetical order.
+\item Make sure that you do not have any modified or new files if you do \code{git status}.
+\end{itemize}
 
-Apply the patches found in the \code{patches} subdirectory of {tinysystem}, in alphabetical order.
-
-Make sure that you do not have any modified or new files if you do \code{git status}.
 
 \section{Configuring Busybox with static libraries}
 
@@ -190,7 +193,7 @@ Specify the installation directory for BusyBox
 It should be the path to your \code{nfsroot} directory.
 
 Alternatively, you can set \code{_install} directory as a dynamic link
-to \code{${HOME}/rootfs}
+to \code{/tftpboot/rootfs}
 
 Exit the configuration, saving changes.
 
@@ -200,9 +203,9 @@ Source the \code{toolchain.sh} script and start the build by typing \code{make}
 
 \section{Installing Busybox}
 
-For this lab, we will create our NFS image in \code{tftpboot/busybox.static}
+For this lab, we will create our NFS image in \code{/tftpboot/busybox.static}
 
-Create the directory and make sure it can be NFS mounted.
+Create the directory and make sure it can be NFS mounted. Don't forget to restart the NFS server.
 
 If you just type \code{make install} all files will be installed with You as the owner,
 but the proper owner for these files is \code{root}.
@@ -251,21 +254,22 @@ nfsopts=nolock
 optargs=video=HDMI-A-1
 
 setpath=setenv rootpath /tftpboot/${image}
+settftp=setenv rootpath ${image}
 setup_ip=setenv ip ${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}::off
 
-tftp_kernel=run setpath ; tftp ${loadaddr} ${rootpath}/${bootdir}/${bootfile}
-tftp_dtb=run setpath    ; tftp ${fdtaddr}  ${rootpath}/${bootdir}/${fdtfile}
+tftp_kernel=run settftp ; tftp ${loadaddr} ${rootpath}/${bootdir}/${bootfile}
+tftp_dtb=run settftp    ; tftp ${fdtaddr}  ${rootpath}/${bootdir}/${fdtfile}
 
-mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot} \
+mmcargs=setenv bootargs console=${console} ${optargs} root=${mmcroot}   \
   rootfstype=${mmcrootfstype} rootwait
 mmcrootfstype=squashfs
 nandboot=echo NAND boot disabled
 
-bootzImage=if test "${bootfile}" = "zImage"; then bootz ${loadaddr} - ${fdtaddr}; fi
-bootuImage=if test "${bootfile}" = "uImage"; then bootm ${loadaddr} - ${fdtaddr}; fi
+bootzImage=if test "${bootfile}" = "zImage";then bootz ${loadaddr} - ${fdtaddr}; fi
+bootuImage=if test "${bootfile}" = "uImage";then bootm ${loadaddr} - ${fdtaddr}; fi
 bootkernel=run bootzImage ; run bootuImage
 
-netargs=run setpath     ; run setup_ip ; setenv bootargs console=${console} \
+netargs=run setpath; run setup_ip ; setenv bootargs console=${console} \
   ${optargs} root=/dev/nfs nfsroot=${serverip}:${rootpath},${nfsopts} rw ip=${ip}
 netboot=echo Booting from network ...; run findfdt; setenv autoload no; \
   run tftp_kernel ; run tftp_dtb ; run netargs; bootm ${loadaddr} - ${fdtaddr}
@@ -334,7 +338,7 @@ Any issue after doing this?
 
 \section{Switching to shared libraries}
 
-Take the \code{hello.c} program supplied in the lab \code{data}
+Take the \code{hello.c} program supplied in the lab \code{hello}
 directory. Cross-compile it for ARM, dynamically-linked with the
 libraries, and run it on the target.
 
@@ -352,8 +356,7 @@ Then try to run \code{hello}
 You will first encounter a \code{not found} error caused by the absence of
 the \code{ld-linux-armhf.so.3} executable, which is the dynamic linker
 required to execute any program compiled with shared libraries. Using
-the find command (see examples in your command memento sheet), look
-for this file in the toolchain install directory.
+the find command look for this file in the toolchain install directory.
 
 This turns out to be a link to \code{ld-2.19.so}, so copy \code{ld-2.19.so}
 to the \code{lib/} directory of the target.
@@ -416,6 +419,10 @@ You should see the \code{dynamic} file.
 \section{Implement a web interface for your device}
 
 Replicate \code{data/www/} to the \code{/www} directory in your target root filesystem.
+
+\begin{verbatim}
+rsync -av <src> <dst>
+\end{verbatim}
 
 Now, run the BusyBox http server from the target command line:
 

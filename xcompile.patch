@@ -1,0 +1,40 @@
+diff --git a/labs/sysdev-kernel-cross-compiling-BBB/sysdev-kernel-cross-compiling-BBB.tex b/labs/sysdev-kernel-cross-compiling-BBB/sysdev-kernel-cross-compiling-BBB.tex
+index 70f94e5..d3f5044 100644
+--- a/labs/sysdev-kernel-cross-compiling-BBB/sysdev-kernel-cross-compiling-BBB.tex
++++ b/labs/sysdev-kernel-cross-compiling-BBB/sysdev-kernel-cross-compiling-BBB.tex
+@@ -59,8 +59,12 @@ Another reason is that \code{PKG_CONFIG_PATH} is not set up.
+ export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+ \end{verbatim}
+ 
+-The \code{toolchain.sh} file changes some critical things, which breaks
+-the kernel configuration make targets.
++\fbox{\begin{minipage}{\textwidth}
++{\bfseries
++Caution: The \code{toolchain.sh} file changes some critical things, which breaks
++the kernel configuration make targets. You may be able to 'make xconfig' by using a separate terminal where you did not source 'toolchain.sh'.
++}
++\end{minipage}}
+ 
+ If you have sourced the file, qt development libraries will not be found.
+ 
+@@ -150,16 +154,16 @@ The kernel support dynamically loaded modules, which needs to be built separatel
+ make modules
+ \end{verbatim}
+ 
+-Install the modules in the \code{${HOME}/rootfs} directory.
++Install the modules in the \code{/tftpboot/rootfs} directory.
+ We will not use them right now, but we will need them later.
+  
+ \begin{verbatim}
+-make INSTALL_MOD_PATH=${HOME}/rootfs modules_install
++make INSTALL_MOD_PATH=/tftpboot/rootfs modules_install
+ \end{verbatim}
+ 
+-Check the contents of the \code{${HOME}/rootfs} directory. There should be a \code{lib} directory.
++Check the contents of the \code{/tftpboot/rootfs} directory. There should be a \code{lib} directory.
+ 
+-Copy the \code{zImage} and DTB files to the directory exposed by the TFTP server.
++Copy the \code{zImage} and DTB files to the /tftpboot directory exposed by the TFTP server.
+ 
+ \section{Setting up serial communication with the board}
+ 

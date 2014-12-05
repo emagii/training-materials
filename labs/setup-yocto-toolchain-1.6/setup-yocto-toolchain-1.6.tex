@@ -191,13 +191,15 @@ Make sure this script is executable (Normally it should be).
 chnmod
 \section{Installing the Cross-Compiler}
 
-Typically the compiler will be installed in \code{/opt/poky/1.6}
+\fbox{\begin{minipage}{\textwidth}
+{\bfseries
+Caution: While the installation script allows you to install the toochain anywhere
+it will not work, unless you install it in "/opt/poky/1.6"
+}
+\end{minipage}}
 
 You normally do not have write access to \code{/opt} so you should
 create the install directory before you install the cross-compiler.
-
-You will be asked where to install the cross-compiler, so an alternative 
-is to change the installation directory to somewhere where you do have write access.
 
 \begin{verbatim}
 sudo mkdir -p /opt/poky
@@ -206,10 +208,9 @@ sudo chown ${USER} /opt/poky
 
 Run the installation script.
 
-Edit the \code{environment-setup-armv7a-vfp-neon-poky-linux-gnueabi} file, 
-in the installation directory adding:
+You will need to fix LDFLAGS, otherwise it will cause problems with building U-Boot later.
 
-You will need to fix LDFLAGS, which will cause problems with building U-Boot later.
+Edit the \code{environment-setup-cortexa8hf-vfp-neon-poky-linux-gnueabi} file in the installation directory:
 
 Comment away the existing definition of LDFLAGS and replace it with an empty defintion.
 
@@ -217,9 +218,7 @@ Comment away the existing definition of LDFLAGS and replace it with an empty def
 export LDFLAGS=""
 \end{verbatim}
 
-From the install directory, copy the 
-\code{environment-setup-armv7a-vfp-neon-poky-linux-gnueabi} to
-\code{toolchain.sh} in the \labdir directory, and make sure it is executable.
+From the install directory, copy the \code{environment-setup-cortexa8hf-vfp-neon-poky-linux-gnueabi} to \code{toolchain.sh} in the \labdir directory, and make sure it is executable.
 
 If you are running any of the extra labs for creating a toolchain
 they may overwrite this file, so beware that you are not running

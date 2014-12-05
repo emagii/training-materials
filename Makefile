@@ -2,10 +2,15 @@
 # inkscape texlive-latex-base texlive-font-utils dia python-pygments
 
 ifeq ($(VENDOR),)
-ifeq ($(HOME),/home/ulf)
+ifeq ($(USER),ulf)
 $(warning "Setting VENDOR to eMagii")
 VENDOR=eMagii
-else
+endif
+ifeq ($(USER),eulfsam)
+$(warning "Setting VENDOR to eMagii")
+VENDOR=eMagii
+endif
+ifeq ($(VENDOR),)
 $(warning "Setting VENDOR to common")
 VENDOR=common
 endif
