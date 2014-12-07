@@ -457,13 +457,14 @@ Try to use even less RAM, and see what happens.
 \begin{itemize}
 \item Your host TFTP server does not work
 \item tftpd-hpa configuration in /etc/default/tftpd-hpa was not set to /tftpboot
-\item The file you want to copy does not exist
-\item The file you want to copy is in the wrong location
+\item The file you want to copy using TFTP does not exist
+\item The file you want to copy using TFTP is in the wrong location
 \item You did not restart tftpd-hpa after you modified the configuration file
 \item Your uSetup.txt is not functional due to bad training material
 \item Your uSetup.txt contains the "\" character to continue a line
+\item Your uSetup.txt is not included, because you did not patch U-boot correctly
 \item You compiled Busybox without export LDFLAGS="--static"
-\item You did 'sudo make install', which builds an x86 busybox (check with Readelf
+\item You did 'sudo make install', which builds an x86 busybox (check with readelf)
 \item You did not create the "/dev" directory
 \item You did not make 'inittab', 'init.d/rcS' executable
 \item You did not export the directory using NFS (/etc/exports)

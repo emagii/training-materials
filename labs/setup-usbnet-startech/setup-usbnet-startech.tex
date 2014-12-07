@@ -36,17 +36,11 @@ From the \labdir directory, You can compile and install the driver by:
 sudo make -C network startech-usb
 \end{verbatim}
 
-\section{Build and install the kernel driver outside the lab}
-
-Extract the tarball, and enter the source directory.
-
-Apply the patches from the \code{../patches} directory
-
+If this fails, or if you are using \code{Ubuntu 14.04} please try: 
 \begin{verbatim}
+cd network/startech
+sudo make clean
 make
+make compile
 sudo make install
 \end{verbatim}
-
-
-
-

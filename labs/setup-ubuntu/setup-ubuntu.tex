@@ -1,5 +1,25 @@
 \subchapter{Setting up Ubuntu}{General Setup of Ubuntu}
 
+\section{Check Linux version}
+Check that you are using 64 bit Ubuntu.
+
+\begin{verbatim}
+$ uname -m
+\end{verbatim}
+
+This should say \code{x86_64}. If it says \code{i686}
+or similar, you will not be able to run the training,
+unless you install.
+
+\section{Check Free Disk Space}
+
+You need to have at least 30 GB free disk space, preferrably 60 GB
+to complete the training, including extra labs.
+
+\begin{verbatim}
+$ df -k
+\end{verbatim}
+
 \section{Install Synaptic}
 
 \begin{verbatim}
@@ -33,6 +53,8 @@ Click on the white \code{Ubuntu} button when you get the login screen
 and select the \code{Gnome Classic} option. Log again.
 
 \code{Gnome Classic} will from now be your default.
+
+If You are using \code{Ubuntu 14.04}, use \code{Gnome Metacity}
 
 \section{Open a terminal}
 

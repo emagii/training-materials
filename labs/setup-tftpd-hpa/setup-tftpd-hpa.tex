@@ -30,15 +30,19 @@ sudo apt-get install tftpd-hpa tftp-hpa
 The configuration file for \code{tftpd} is \code{/etc/init/tftpd-hpa.conf}
 which uses \code{/etc/default/tftpd-hpa}.
 
+Open this file in an editor. Since it is owned by root, you have to edit in supervisor mode.
+
 The default TFTP directory is \code{/var/lib/tftpboot}
 
-You may want to change this to:
+You should change this to:
 
 \begin{verbatim}
 TFTP_DIRECTORY="/tftpboot"
 \end{verbatim}
 
-and make sure that  \code{tftpboot"} is easily accessible
+Save the updated file.
+
+Make sure that  \code{tftpboot"} is easily accessible
 
 \begin{verbatim}
 sudo    mkdir -p        /tftpboot
@@ -82,7 +86,7 @@ cat testfile.txt
 
 \fbox{\begin{minipage}{\textwidth}
 {\bfseries
-Caution: Note that tftp localhost seems not to work
+Caution: Note that tftp localhost may not to work, unless you are superuser
 }
 \end{minipage}}
 

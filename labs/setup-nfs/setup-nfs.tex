@@ -26,7 +26,7 @@ The NFS configuration file (\code{/etc/exports}) needs to be modified.
 Edit the file as \code{root} and add the following line: (Replace \code{/home/ulf} with your own home directory)
 
 \begin{verbatim}
-/tftpboot/rootfs *(rw,sync,no_root_squash,no_subtree_check)
+/tftpboot/rootfs		*(rw,sync,no_root_squash,no_subtree_check)
 \end{verbatim}
 
 The format for the line is 
@@ -42,7 +42,17 @@ Also make sure that there is no space between the IP address and the NFS
 options, otherwise default options will be used for this IP address,
 causing your root filesystem to be read-only.
 
-Then, restart the NFS server:
+Create lines for a few other locations, options will be the same:
+\begin{verbatim}
+/tftpboot/rootfs		*(rw,sync,no_root_squash,no_subtree_check)
+/tftpboot/busybox.static	*(rw,sync,no_root_squash,no_subtree_check)
+/tftpboot/busybox.dynamic	*(rw,sync,no_root_squash,no_subtree_check)
+/tftpboot/busybox.httpd		*(rw,sync,no_root_squash,no_subtree_check)
+\end{verbatim}
+
+Make sure that the directories above exists, and are owned by You.
+
+Restart the NFS server:
 
 \begin{verbatim}
 sudo service nfs-kernel-server restart
