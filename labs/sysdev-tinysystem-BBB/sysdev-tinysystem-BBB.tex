@@ -399,6 +399,8 @@ Build Busybox with shared libraries, and install it on the target filesystem.
 
 Copy non busybox parts from the previous build. Dont forget the kernel files.
 
+Make sure that the C library files and symbolic links are in \code{lib}.
+
 Create the \code{dynamic} textfile in the toplevel.
 
 Time to boot the system. How can you make sure that 
@@ -450,3 +452,24 @@ enough, boot the kernel with the \code{mem=20M} parameter. Linux will then
 use just 20 MB of RAM, and ignore the rest.
 
 Try to use even less RAM, and see what happens.
+
+\section{Common Errors}
+\begin{itemize}
+\item Your host TFTP server does not work
+\item tftpd-hpa configuration in /etc/default/tftpd-hpa was not set to /tftpboot
+\item The file you want to copy does not exist
+\item The file you want to copy is in the wrong location
+\item You did not restart tftpd-hpa after you modified the configuration file
+\item Your uSetup.txt is not functional due to bad training material
+\item Your uSetup.txt contains the "\" character to continue a line
+\item You compiled Busybox without export LDFLAGS="--static"
+\item You did 'sudo make install', which builds an x86 busybox (check with Readelf
+\item You did not create the "/dev" directory
+\item You did not make 'inittab', 'init.d/rcS' executable
+\item You did not export the directory using NFS (/etc/exports)
+\item You did not restart the NFS server
+\item Kernel was not configured to allow NFS boot
+\item Squashfs was compiled as a module.
+\item The C library files is not available in /lib for shared libraries
+\end{itemize}
+
